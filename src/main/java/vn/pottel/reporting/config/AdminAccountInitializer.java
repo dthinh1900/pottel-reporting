@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import vn.pottel.reporting.entity.AppUser;
-import vn.pottel.reporting.repository.AppUserRepository;
+import vn.pottel.reporting.user.entity.AppUser;
+import vn.pottel.reporting.user.repository.AppUserRepository;
 
 @Configuration
 public class AdminAccountInitializer {
@@ -24,9 +24,6 @@ public class AdminAccountInitializer {
 
             if (username == null || username.isBlank()
                     || password == null || password.isBlank()) {
-                System.out.println(
-                    "Chua cau hinh APP_ADMIN_USERNAME va APP_ADMIN_PASSWORD."
-                );
                 return;
             }
 

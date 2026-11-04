@@ -10,8 +10,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 
-import vn.pottel.reporting.entity.AppUser;
-import vn.pottel.reporting.repository.AppUserRepository;
+import vn.pottel.reporting.user.entity.AppUser;
+import vn.pottel.reporting.user.repository.AppUserRepository;
 
 @Controller
 @RequestMapping("/admin")

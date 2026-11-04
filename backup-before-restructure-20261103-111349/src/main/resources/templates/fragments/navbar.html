@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body>
+
+<nav th:fragment="navbar"
+     class="navbar navbar-expand-lg navbar-dark app-navbar">
+
+    <div class="container-fluid px-4">
+
+        <!-- LOGO -->
+        <a class="navbar-brand app-brand" th:href="@{/}">
+            <span class="brand-icon">
+                <i class="bi bi-bar-chart-line-fill"></i>
+            </span>
+
+            <span>
+                POTTEL <strong>REPORTING</strong>
+            </span>
+        </a>
+
+        <!-- MENU MOBILE -->
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#appNavbar"
+                aria-controls="appNavbar"
+                aria-expanded="false"
+                aria-label="Mở menu">
+
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- MENU -->
+        <div class="collapse navbar-collapse" id="appNavbar">
+
+            <div class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+
+                <!-- TRANG CHỦ -->
+                <a class="nav-link app-nav-link"
+                   th:href="@{/}"
+                   th:unless="${currentPage == 'home'}">
+
+                    <i class="bi bi-house-door me-1"></i>
+                    Trang chủ
+                </a>
+
+                <!-- QUẢN LÝ TÀI KHOẢN -->
+                <a class="nav-link app-nav-link"
+                   th:href="@{/admin/accounts}"
+                   sec:authorize="hasRole('ADMIN')"
+                   th:unless="${currentPage == 'admin'}">
+
+                    <i class="bi bi-people me-1"></i>
+                    Quản lý tài khoản
+                </a>
+
+                <!-- THÔNG TIN NGƯỜI DÙNG -->
+                <div class="user-info">
+
+                    <span class="user-avatar">
+                        <i class="bi bi-person-fill"></i>
+                    </span>
+
+                    <span sec:authentication="name"
+                          class="username"></span>
+                </div>
+
+                <!-- ĐĂNG XUẤT -->
+                <form th:action="@{/logout}"
+                      method="post"
+                      class="m-0">
+
+                    <button type="submit" class="btn btn-logout">
+                        <i class="bi bi-box-arrow-right me-1"></i>
+                        Đăng xuất
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</nav>
+
+</body>
+</html>

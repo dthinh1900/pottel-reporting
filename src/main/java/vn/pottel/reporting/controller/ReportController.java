@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import vn.pottel.reporting.model.ThamSoBaoCao;
-import vn.pottel.reporting.runner.BaoCaoRunner;
+import vn.pottel.reporting.baocao.model.ThamSoBaoCao;
+import vn.pottel.reporting.baocao.runner.BaoCaoRunner;
+import vn.pottel.reporting.baocao.model.KetQuaBaoCao;
+import vn.pottel.reporting.data.BangKetQua;
 
 @Controller
 @RequestMapping("/reports")
@@ -249,38 +251,67 @@ public class ReportController {
                 String selectedBc,
                 ThamSoBaoCao thamSo
         ) {
-                int totalRows;
+        model.addAttribute("selectedBc", selectedBc);
 
-                model.addAttribute("selectedBc", selectedBc);
+        // Bước 1: Chạy báo cáo bằng luồng xử lý mới.
+        KetQuaBaoCao ketQua = runner.chayBcDs01(thamSo);
 
-                if ("1B".equals(selectedBc)) {
-                List<Map<String, Object>> dailySummary =
-                        runner.chayBang1B(thamSo);
+        // Bước 2: Lấy bảng kết quả tương ứng.
+        String maBang = selectedBc;
 
-                totalRows = runner.demSoNgayBang1B(thamSo);
+        BangKetQua bang = ketQua.layBang(maBang);
+
+        if (bang == null) {
+                throw new IllegalStateException(
+                        "Không tìm thấy bảng kết quả: " + maBang
+                );
+        }
+
+        // Bước 3: Chuyển kết quả sang dạng dữ liệu giao diện đang sử dụng.
+        if ("1B".equals(selectedBc)) {
+                List<Map<String, Object>> dailySummary = bang.dong();
 
                 model.addAttribute("dailySummary", dailySummary);
-
-                } else {
-                List<Map<String, Object>> subscriberDetails =
-                        runner.chayBang1C(thamSo);
-
-                totalRows = runner.demDongBang1C(thamSo);
+        } else {
+                List<Map<String, Object>> subscriberDetails = bang.dong();
 
                 model.addAttribute("subscriberDetails", subscriberDetails);
-                }
+        }
 
-                int totalPages = (int) Math.ceil(
-                        (double) totalRows / thamSo.kichThuoc()
-                );
+        // Bước 4: Lấy tổng số dòng từ bảng đếm.
+        int totalRows;
 
-                if (totalPages < 1) {
+        if ("1B".equals(selectedBc)) {
+        totalRows = runner.demSoNgayBang1B(thamSo);
+        } else {
+        BangKetQua bangDem = ketQua.layBang("1D");
+
+        if (bangDem == null || bangDem.dong().isEmpty()) {
+                totalRows = 0;
+        } else {
+                Object giaTri = bangDem.dong().get(0).get("total_rows");
+                totalRows = giaTri == null ? 0 : ((Number) giaTri).intValue();
+        }
+        }
+
+        int totalPages = (int) Math.ceil(
+                (double) totalRows / thamSo.kichThuoc()
+        );
+
+        if (totalPages < 1) {
                 totalPages = 1;
-                }
+        }
 
-                model.addAttribute("currentPage", thamSo.trang());
-                model.addAttribute("pageSize", thamSo.kichThuoc());
-                model.addAttribute("totalRows", totalRows);
-                model.addAttribute("totalPages", totalPages);
+        if (thamSo.trang() < 1 || thamSo.trang() > totalPages) {
+                throw new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.BAD_REQUEST,
+                        "Số trang không hợp lệ."
+                );
+        }
+
+        model.addAttribute("currentPage", thamSo.trang());
+        model.addAttribute("pageSize", thamSo.kichThuoc());
+        model.addAttribute("totalRows", totalRows);
+        model.addAttribute("totalPages", totalPages);
         }
 }

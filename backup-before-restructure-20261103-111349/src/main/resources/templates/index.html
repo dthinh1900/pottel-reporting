@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Pottel Reporting</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <!-- Shared CSS -->
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+
+    <!-- Homepage CSS -->
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+
+<body class="home-page">
+
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <main class="main-container">
+
+        <!-- HERO SECTION -->
+        <section class="hero-section">
+
+            <div class="hero-content">
+
+                <div class="hero-label">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                    POTTEL BSS / REPORTING SYSTEM
+                </div>
+
+                <h1 class="hero-title">
+                    Hệ thống báo cáo Pottel BSS
+                </h1>
+
+                <p class="hero-description">
+                    Hệ thống tổng hợp dữ liệu, đối soát và phân tích
+                    hoạt động kinh doanh.
+                </p>
+
+            </div>
+
+            <div class="hero-decoration">P</div>
+
+        </section>
+
+        <!-- REPORT SECTION -->
+        <section class="report-section">
+
+            <div class="section-top">
+
+                <div>
+                    <div class="section-label">
+                        REPORT CENTER
+                    </div>
+
+                    <h2 class="section-heading">
+                        Danh mục báo cáo
+                    </h2>
+
+                    <p class="section-description">
+                        Lựa chọn chức năng báo cáo để xem và khai thác dữ liệu.
+                    </p>
+                </div>
+
+                <div class="report-count">
+                    <i class="bi bi-collection"></i>
+                    Tổng số: <strong>03 báo cáo</strong>
+                </div>
+
+            </div>
+
+            <div class="row g-4">
+
+                <!-- REPORT 1 -->
+                <div class="col-md-4">
+
+                    <div class="report-card">
+
+                        <div class="report-card-body">
+
+                            <div class="report-card-top">
+                                <div class="report-icon icon-blue">
+                                    <i class="bi bi-arrow-left-right"></i>
+                                </div>
+                            </div>
+
+                            <div class="report-code">
+                                REPORT / BC-DS-01
+                            </div>
+
+                            <h5 class="report-title">
+                                Đối soát dữ liệu
+                            </h5>
+
+                            <p class="report-description">
+                                Kiểm tra dữ liệu KIT và GOI_MOI,
+                                phát hiện các trường hợp bất thường.
+                            </p>
+
+                            <a th:href="@{/reports/bc-ds-01}"
+                               class="report-button report-button-primary">
+                                Mở báo cáo
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+
+                        </div>
+
+                        <div class="report-card-footer">
+                            <span>Báo cáo đối soát</span>
+
+                            <span class="status-active">
+                                <span class="status-dot"></span>
+                                Đang hoạt động
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- REPORT 2 -->
+                <div class="col-md-4">
+
+                    <div class="report-card">
+
+                        <div class="report-card-body">
+
+                            <div class="report-card-top">
+                                <div class="report-icon icon-purple">
+                                    <i class="bi bi-bar-chart-line"></i>
+                                </div>
+                            </div>
+
+                            <div class="report-code">
+                                REPORT / BC-SL
+                            </div>
+
+                            <h5 class="report-title">
+                                Báo cáo sản lượng
+                            </h5>
+
+                            <p class="report-description">
+                                Theo dõi số lượng KIT, thuê bao kích hoạt
+                                và các luồng CDR.
+                            </p>
+
+                            <button class="report-button report-button-disabled"
+                                    type="button"
+                                    disabled>
+                                <i class="bi bi-clock-history"></i>
+                                Đang xây dựng
+                            </button>
+
+                        </div>
+
+                        <div class="report-card-footer">
+                            <span>Báo cáo sản lượng</span>
+
+                            <span class="status-pending">
+                                <span class="status-dot"></span>
+                                Chưa triển khai
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- REPORT 3 -->
+                <div class="col-md-4">
+
+                    <div class="report-card">
+
+                        <div class="report-card-body">
+
+                            <div class="report-card-top">
+                                <div class="report-icon icon-green">
+                                    <i class="bi bi-cash-stack"></i>
+                                </div>
+                            </div>
+
+                            <div class="report-code">
+                                REPORT / BC-DT
+                            </div>
+
+                            <h5 class="report-title">
+                                Báo cáo doanh thu
+                            </h5>
+
+                            <p class="report-description">
+                                Tổng hợp doanh thu và phân tích
+                                hiệu quả kinh doanh.
+                            </p>
+
+                            <button class="report-button report-button-disabled"
+                                    type="button"
+                                    disabled>
+                                <i class="bi bi-clock-history"></i>
+                                Đang xây dựng
+                            </button>
+
+                        </div>
+
+                        <div class="report-card-footer">
+                            <span>Báo cáo doanh thu</span>
+
+                            <span class="status-pending">
+                                <span class="status-dot"></span>
+                                Chưa triển khai
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

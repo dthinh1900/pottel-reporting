@@ -548,7 +548,19 @@
                 errorMessage.hidden = true;
                 tableContainer.style.opacity = "0.5";
 
-                const params = new URLSearchParams(new FormData(filterForm));
+                const formData = new FormData(filterForm);
+
+                console.log("MSISDN trong input:",
+                    document.getElementById("msisdn")?.value
+                );
+
+                console.log("MSISDN trong FormData:",
+                    formData.get("msisdn")
+                );
+
+                const params = new URLSearchParams(formData);
+
+                console.log("Request URL:", endpoint + "?" + params.toString());
 
                 try {
 
