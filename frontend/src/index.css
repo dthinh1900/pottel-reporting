@@ -1,0 +1,57 @@
+/* ================================
+   GLOBAL RESET
+================================ */
+
+:root {
+  --pottel-yellow: #ffc400;
+  --pottel-orange: #ff8a00;
+  --pottel-navy: #101d3a;
+  --pottel-bg: #f5f7fa;
+  --pottel-white: #ffffff;
+
+  --text-primary: #101d3a;
+  --text-secondary: #64748b;
+  --text-muted: #aab8d0;
+
+  --border-color: #dce3ed;
+  --accent-blue: #2563eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--pottel-bg);
+  color: var(--text-primary);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+#root {
+  min-height: 100vh;
+}
