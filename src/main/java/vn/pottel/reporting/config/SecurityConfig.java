@@ -73,7 +73,7 @@ public class SecurityConfig {
                 .requestMatchers("/error").permitAll()
 
                 // API đăng nhập và đăng ký không cần JWT.
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/auth/**", "/api/auth/**").permitAll()    
 
                 // Chỉ ADMIN được sử dụng API quản trị.
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
