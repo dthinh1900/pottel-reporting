@@ -45,3 +45,13 @@ application-secret.properties
 ### Database backups ###
 *.dump
 *.backup
+
+# Node.js
+frontend/node_modules/
+frontend/dist/
+
+# Vite
+**/.vite/
+
+# Java
+target/
