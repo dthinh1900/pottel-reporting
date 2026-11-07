@@ -126,6 +126,7 @@ export function apiPost(path, body) {
   })
 }
 
+
 // Đăng nhập
 export async function login(tenDangNhap, matKhau) {
   let response
@@ -167,7 +168,6 @@ export async function login(tenDangNhap, matKhau) {
     )
   }
 
-  // Lưu JWT sau khi đăng nhập thành công
   localStorage.setItem(TOKEN_KEY, data.token)
 
   return data
