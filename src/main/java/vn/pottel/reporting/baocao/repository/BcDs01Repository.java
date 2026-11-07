@@ -1,3 +1,4 @@
+
 package vn.pottel.reporting.baocao.repository;
 
 import java.sql.Date;
@@ -82,8 +83,6 @@ public class BcDs01Repository {
     }
 
     // =====================================================
-<<<<<<< HEAD
-=======
     // BẢNG 1B - TỔNG HỢP GOI_MOI THEO NGÀY
     // =====================================================
 
@@ -107,11 +106,11 @@ public class BcDs01Repository {
         Date to = toDate == null ? null : Date.valueOf(toDate);
 
         return jdbcTemplate.queryForList(
-            sql,
-            from,
-            to,
-            pageSize,
-            offset
+                sql,
+                from,
+                to,
+                pageSize,
+                offset
         );
     }
 
@@ -120,171 +119,170 @@ public class BcDs01Repository {
     // =====================================================
 
     public List<Map<String, Object>> getSubscriberDetails(
-        LocalDate fromDate,
-        LocalDate toDate,
-        String msisdn,
-        String kitStatus,
-        String reconciliationStatus,
-        String tinhTrangGoiMoi,
-        int pageSize,
-        int offset) {
+            LocalDate fromDate,
+            LocalDate toDate,
+            String msisdn,
+            String kitStatus,
+            String reconciliationStatus,
+            String tinhTrangGoiMoi,
+            int pageSize,
+            int offset) {
 
-    String sql = """
-        WITH kit AS (
-            SELECT
-                NULLIF(BTRIM(msisdn_snapshot), '') AS msisdn,
-                STRING_AGG(DISTINCT status, ', ') AS kit_status,
-                MAX(registed_date) AS registed_date,
-                COUNT(*) AS kit_row_count
-            FROM crm.linhnn_kits_prod
-            WHERE NULLIF(BTRIM(msisdn_snapshot), '') IS NOT NULL
-            GROUP BY NULLIF(BTRIM(msisdn_snapshot), '')
-        ),
-        goi_moi AS (
-            SELECT
-                NULLIF(BTRIM(msisdn), '') AS msisdn,
-                COUNT(*) AS event_count,
-                MIN(TO_DATE(TRIM(insert_time), 'DD-MON-YY'))
-                    AS first_event_date,
-                MAX(TO_DATE(TRIM(insert_time), 'DD-MON-YY'))
-                    AS last_event_date
-            FROM cdr.vnpt_package_new
-            WHERE NULLIF(BTRIM(msisdn), '') IS NOT NULL
-              AND insert_time IS NOT NULL
-              AND TRIM(insert_time) <> ''
+        String sql = """
+            WITH kit AS (
+                SELECT
+                    NULLIF(BTRIM(msisdn_snapshot), '') AS msisdn,
+                    STRING_AGG(DISTINCT status, ', ') AS kit_status,
+                    MAX(registed_date) AS registed_date,
+                    COUNT(*) AS kit_row_count
+                FROM crm.linhnn_kits_prod
+                WHERE NULLIF(BTRIM(msisdn_snapshot), '') IS NOT NULL
+                GROUP BY NULLIF(BTRIM(msisdn_snapshot), '')
+            ),
+            goi_moi AS (
+                SELECT
+                    NULLIF(BTRIM(msisdn), '') AS msisdn,
+                    COUNT(*) AS event_count,
+                    MIN(TO_DATE(TRIM(insert_time), 'DD-MON-YY'))
+                        AS first_event_date,
+                    MAX(TO_DATE(TRIM(insert_time), 'DD-MON-YY'))
+                        AS last_event_date
+                FROM cdr.vnpt_package_new
+                WHERE NULLIF(BTRIM(msisdn), '') IS NOT NULL
+                  AND insert_time IS NOT NULL
+                  AND TRIM(insert_time) <> ''
+                  AND (
+                        CAST(? AS DATE) IS NULL
+                        OR TO_DATE(TRIM(insert_time), 'DD-MON-YY')
+                            >= CAST(? AS DATE)
+                  )
+                  AND (
+                        CAST(? AS DATE) IS NULL
+                        OR TO_DATE(TRIM(insert_time), 'DD-MON-YY')
+                            <= CAST(? AS DATE)
+                  )
+                GROUP BY NULLIF(BTRIM(msisdn), '')
+            ),
+            details AS (
+                SELECT
+                    COALESCE(k.msisdn, g.msisdn) AS msisdn,
+                    k.kit_status,
+                    k.registed_date,
+                    COALESCE(k.kit_row_count, 0) AS kit_row_count,
+                    COALESCE(g.event_count, 0) AS event_count,
+                    g.first_event_date,
+                    g.last_event_date,
+                    CASE
+                        WHEN k.msisdn IS NULL
+                            THEN 'Không tìm thấy KIT'
+                        WHEN g.msisdn IS NULL
+                            THEN 'Chỉ có KIT'
+                        WHEN k.registed_date IS NULL
+                            THEN 'Khớp KIT - thiếu ngày đăng ký'
+                        ELSE 'Khớp KIT'
+                    END AS reconciliation_status
+                FROM kit k
+                FULL OUTER JOIN goi_moi g
+                    ON k.msisdn = g.msisdn
+            )
+            SELECT *
+            FROM details
+            WHERE (
+                    CAST(? AS TEXT) IS NULL
+                    OR msisdn LIKE CAST(? AS TEXT)
+                  )
               AND (
-                    CAST(? AS DATE) IS NULL
-                    OR TO_DATE(TRIM(insert_time), 'DD-MON-YY')
-                        >= CAST(? AS DATE)
-              )
+                    CAST(? AS TEXT) IS NULL
+                    OR EXISTS (
+                        SELECT 1
+                        FROM crm.linhnn_kits_prod kf
+                        WHERE NULLIF(BTRIM(kf.msisdn_snapshot), '')
+                                = details.msisdn
+                          AND BTRIM(kf.status) = CAST(? AS TEXT)
+                    )
+                  )
               AND (
-                    CAST(? AS DATE) IS NULL
-                    OR TO_DATE(TRIM(insert_time), 'DD-MON-YY')
-                        <= CAST(? AS DATE)
-              )
-            GROUP BY NULLIF(BTRIM(msisdn), '')
-        ),
-        details AS (
-            SELECT
-                COALESCE(k.msisdn, g.msisdn) AS msisdn,
-                k.kit_status,
-                k.registed_date,
-                COALESCE(k.kit_row_count, 0) AS kit_row_count,
-                COALESCE(g.event_count, 0) AS event_count,
-                g.first_event_date,
-                g.last_event_date,
-                CASE
-                    WHEN k.msisdn IS NULL
-                        THEN 'Không tìm thấy KIT'
-                    WHEN g.msisdn IS NULL
-                        THEN 'Chỉ có KIT'
-                    WHEN k.registed_date IS NULL
-                        THEN 'Khớp KIT - thiếu ngày đăng ký'
-                    ELSE 'Khớp KIT'
-                END AS reconciliation_status
-            FROM kit k
-            FULL OUTER JOIN goi_moi g
-                ON k.msisdn = g.msisdn
-        )
-        SELECT *
-        FROM details
-        WHERE (
-                CAST(? AS TEXT) IS NULL
-                OR msisdn LIKE CAST(? AS TEXT)
-              )
-          AND (
-                CAST(? AS TEXT) IS NULL
-                OR EXISTS (
-                    SELECT 1
-                    FROM crm.linhnn_kits_prod kf
-                    WHERE NULLIF(BTRIM(kf.msisdn_snapshot), '')
-                            = details.msisdn
-                      AND BTRIM(kf.status) = CAST(? AS TEXT)
-                )
-              )
-          AND (
-                CAST(? AS TEXT) IS NULL
-                OR reconciliation_status = CAST(? AS TEXT)
-              )
-          AND (
-                CAST(? AS TEXT) IS NULL
-                OR (
-                    CAST(? AS TEXT) = 'HAS'
-                    AND EXISTS (
-                        SELECT 1
-                        FROM cdr.vnpt_package_new gm
-                        WHERE NULLIF(BTRIM(gm.msisdn), '')
-                                = details.msisdn
+                    CAST(? AS TEXT) IS NULL
+                    OR reconciliation_status = CAST(? AS TEXT)
+                  )
+              AND (
+                    CAST(? AS TEXT) IS NULL
+                    OR (
+                        CAST(? AS TEXT) = 'HAS'
+                        AND EXISTS (
+                            SELECT 1
+                            FROM cdr.vnpt_package_new gm
+                            WHERE NULLIF(BTRIM(gm.msisdn), '')
+                                    = details.msisdn
+                        )
                     )
-                )
-                OR (
-                    CAST(? AS TEXT) = 'NONE'
-                    AND NOT EXISTS (
-                        SELECT 1
-                        FROM cdr.vnpt_package_new gm
-                        WHERE NULLIF(BTRIM(gm.msisdn), '')
-                                = details.msisdn
+                    OR (
+                        CAST(? AS TEXT) = 'NONE'
+                        AND NOT EXISTS (
+                            SELECT 1
+                            FROM cdr.vnpt_package_new gm
+                            WHERE NULLIF(BTRIM(gm.msisdn), '')
+                                    = details.msisdn
+                        )
                     )
-                )
-              )
-        ORDER BY
-            last_event_date ASC NULLS LAST,
-            msisdn ASC
-        LIMIT ? OFFSET ?
-        """;
+                  )
+            ORDER BY
+                last_event_date ASC NULLS LAST,
+                msisdn ASC
+            LIMIT ? OFFSET ?
+            """;
 
-    Date from = fromDate == null ? null : Date.valueOf(fromDate);
-    Date to = toDate == null ? null : Date.valueOf(toDate);
+        Date from = fromDate == null ? null : Date.valueOf(fromDate);
+        Date to = toDate == null ? null : Date.valueOf(toDate);
 
-    String normalizedMsisdn =
-            (msisdn == null || msisdn.isBlank())
-                    ? null
-                    : "%" + msisdn.trim() + "%";
+        String normalizedMsisdn =
+                (msisdn == null || msisdn.isBlank())
+                        ? null
+                        : "%" + msisdn.trim() + "%";
 
-    String normalizedStatus =
-            (kitStatus == null || kitStatus.isBlank())
-                    ? null
-                    : kitStatus.trim();
+        String normalizedStatus =
+                (kitStatus == null || kitStatus.isBlank())
+                        ? null
+                        : kitStatus.trim();
 
-    String normalizedReconciliation =
-            (reconciliationStatus == null
-                    || reconciliationStatus.isBlank())
-                    ? null
-                    : reconciliationStatus.trim();
+        String normalizedReconciliation =
+                (reconciliationStatus == null
+                        || reconciliationStatus.isBlank())
+                        ? null
+                        : reconciliationStatus.trim();
 
-    String normalizedGoiMoi =
-            (tinhTrangGoiMoi == null || tinhTrangGoiMoi.isBlank())
-                    ? null
-                    : tinhTrangGoiMoi.trim();
+        String normalizedGoiMoi =
+                (tinhTrangGoiMoi == null || tinhTrangGoiMoi.isBlank())
+                        ? null
+                        : tinhTrangGoiMoi.trim();
 
-    return jdbcTemplate.queryForList(
-            sql,
+        return jdbcTemplate.queryForList(
+                sql,
 
-            // Điều kiện ngày trong CTE goi_moi
-            from, from,
-            to, to,
+                // Điều kiện ngày trong CTE goi_moi
+                from, from,
+                to, to,
 
-            // Điều kiện MSISDN
-            normalizedMsisdn, normalizedMsisdn,
+                // Điều kiện MSISDN
+                normalizedMsisdn, normalizedMsisdn,
 
-            // Điều kiện trạng thái KIT
-            normalizedStatus, normalizedStatus,
+                // Điều kiện trạng thái KIT
+                normalizedStatus, normalizedStatus,
 
-            // Điều kiện trạng thái đối soát
-            normalizedReconciliation, normalizedReconciliation,
+                // Điều kiện trạng thái đối soát
+                normalizedReconciliation, normalizedReconciliation,
 
-            // Điều kiện tình trạng GOI_MOI
-            normalizedGoiMoi,
-            normalizedGoiMoi,
-            normalizedGoiMoi,
+                // Điều kiện tình trạng GOI_MOI
+                normalizedGoiMoi,
+                normalizedGoiMoi,
+                normalizedGoiMoi,
 
-            // Phân trang
-            pageSize, offset
-    );
-}
+                // Phân trang
+                pageSize, offset
+        );
+    }
 
     // =====================================================
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
     // DANH SÁCH LỰA CHỌN CHO BỘ LỌC
     // =====================================================
 
@@ -339,170 +337,172 @@ public class BcDs01Repository {
     }
 
     // =====================================================
-<<<<<<< HEAD
-=======
     // ĐẾM TỔNG SỐ DÒNG CỦA BẢNG 1C SAU KHI LỌC
     // =====================================================
 
-    public int countSubscriberDetails(LocalDate fromDate,LocalDate toDate,
-        String msisdn,String kitStatus,String reconciliationStatus,String tinhTrangGoiMoi) {
+    public int countSubscriberDetails(
+            LocalDate fromDate,
+            LocalDate toDate,
+            String msisdn,
+            String kitStatus,
+            String reconciliationStatus,
+            String tinhTrangGoiMoi) {
 
-    String sql = """
-        WITH kit AS (
-            SELECT
-                NULLIF(BTRIM(msisdn_snapshot), '') AS msisdn,
-                STRING_AGG(DISTINCT status, ', ') AS kit_status,
-                MAX(registed_date) AS registed_date,
-                COUNT(*) AS kit_row_count
-            FROM crm.linhnn_kits_prod
-            WHERE NULLIF(BTRIM(msisdn_snapshot), '') IS NOT NULL
-            GROUP BY NULLIF(BTRIM(msisdn_snapshot), '')
-        ),
-        goi_moi AS (
-            SELECT
-                NULLIF(BTRIM(msisdn), '') AS msisdn,
-                COUNT(*) AS event_count,
-                MIN(TO_DATE(TRIM(insert_time), 'DD-MON-YY'))
-                    AS first_event_date,
-                MAX(TO_DATE(TRIM(insert_time), 'DD-MON-YY'))
-                    AS last_event_date
-            FROM cdr.vnpt_package_new
-            WHERE NULLIF(BTRIM(msisdn), '') IS NOT NULL
-              AND insert_time IS NOT NULL
-              AND TRIM(insert_time) <> ''
+        String sql = """
+            WITH kit AS (
+                SELECT
+                    NULLIF(BTRIM(msisdn_snapshot), '') AS msisdn,
+                    STRING_AGG(DISTINCT status, ', ') AS kit_status,
+                    MAX(registed_date) AS registed_date,
+                    COUNT(*) AS kit_row_count
+                FROM crm.linhnn_kits_prod
+                WHERE NULLIF(BTRIM(msisdn_snapshot), '') IS NOT NULL
+                GROUP BY NULLIF(BTRIM(msisdn_snapshot), '')
+            ),
+            goi_moi AS (
+                SELECT
+                    NULLIF(BTRIM(msisdn), '') AS msisdn,
+                    COUNT(*) AS event_count,
+                    MIN(TO_DATE(TRIM(insert_time), 'DD-MON-YY'))
+                        AS first_event_date,
+                    MAX(TO_DATE(TRIM(insert_time), 'DD-MON-YY'))
+                        AS last_event_date
+                FROM cdr.vnpt_package_new
+                WHERE NULLIF(BTRIM(msisdn), '') IS NOT NULL
+                  AND insert_time IS NOT NULL
+                  AND TRIM(insert_time) <> ''
+                  AND (
+                        CAST(? AS DATE) IS NULL
+                        OR TO_DATE(TRIM(insert_time), 'DD-MON-YY')
+                            >= CAST(? AS DATE)
+                  )
+                  AND (
+                        CAST(? AS DATE) IS NULL
+                        OR TO_DATE(TRIM(insert_time), 'DD-MON-YY')
+                            <= CAST(? AS DATE)
+                  )
+                GROUP BY NULLIF(BTRIM(msisdn), '')
+            ),
+            details AS (
+                SELECT
+                    COALESCE(k.msisdn, g.msisdn) AS msisdn,
+                    k.kit_status,
+                    k.registed_date,
+                    COALESCE(k.kit_row_count, 0) AS kit_row_count,
+                    COALESCE(g.event_count, 0) AS event_count,
+                    g.first_event_date,
+                    g.last_event_date,
+                    CASE
+                        WHEN k.msisdn IS NULL
+                            THEN 'Không tìm thấy KIT'
+                        WHEN g.msisdn IS NULL
+                            THEN 'Chỉ có KIT'
+                        WHEN k.registed_date IS NULL
+                            THEN 'Khớp KIT - thiếu ngày đăng ký'
+                        ELSE 'Khớp KIT'
+                    END AS reconciliation_status
+                FROM kit k
+                FULL OUTER JOIN goi_moi g
+                    ON k.msisdn = g.msisdn
+            )
+            SELECT COUNT(*)
+            FROM details
+            WHERE (
+                    CAST(? AS TEXT) IS NULL
+                    OR msisdn LIKE CAST(? AS TEXT)
+                  )
               AND (
-                    CAST(? AS DATE) IS NULL
-                    OR TO_DATE(TRIM(insert_time), 'DD-MON-YY')
-                        >= CAST(? AS DATE)
-              )
+                    CAST(? AS TEXT) IS NULL
+                    OR EXISTS (
+                        SELECT 1
+                        FROM crm.linhnn_kits_prod kf
+                        WHERE NULLIF(BTRIM(kf.msisdn_snapshot), '')
+                                = details.msisdn
+                          AND BTRIM(kf.status) = CAST(? AS TEXT)
+                    )
+                  )
               AND (
-                    CAST(? AS DATE) IS NULL
-                    OR TO_DATE(TRIM(insert_time), 'DD-MON-YY')
-                        <= CAST(? AS DATE)
-              )
-            GROUP BY NULLIF(BTRIM(msisdn), '')
-        ),
-        details AS (
-            SELECT
-                COALESCE(k.msisdn, g.msisdn) AS msisdn,
-                k.kit_status,
-                k.registed_date,
-                COALESCE(k.kit_row_count, 0) AS kit_row_count,
-                COALESCE(g.event_count, 0) AS event_count,
-                g.first_event_date,
-                g.last_event_date,
-                CASE
-                    WHEN k.msisdn IS NULL
-                        THEN 'Không tìm thấy KIT'
-                    WHEN g.msisdn IS NULL
-                        THEN 'Chỉ có KIT'
-                    WHEN k.registed_date IS NULL
-                        THEN 'Khớp KIT - thiếu ngày đăng ký'
-                    ELSE 'Khớp KIT'
-                END AS reconciliation_status
-            FROM kit k
-            FULL OUTER JOIN goi_moi g
-                ON k.msisdn = g.msisdn
-        )
-        SELECT COUNT(*)
-        FROM details
-        WHERE (
-                CAST(? AS TEXT) IS NULL
-                OR msisdn LIKE CAST(? AS TEXT)
-              )
-          AND (
-                CAST(? AS TEXT) IS NULL
-                OR EXISTS (
-                    SELECT 1
-                    FROM crm.linhnn_kits_prod kf
-                    WHERE NULLIF(BTRIM(kf.msisdn_snapshot), '')
-                            = details.msisdn
-                      AND BTRIM(kf.status) = CAST(? AS TEXT)
-                )
-              )
-          AND (
-                CAST(? AS TEXT) IS NULL
-                OR reconciliation_status = CAST(? AS TEXT)
-              )
-          AND (
-                CAST(? AS TEXT) IS NULL
-                OR (
-                    CAST(? AS TEXT) = 'HAS'
-                    AND EXISTS (
-                        SELECT 1
-                        FROM cdr.vnpt_package_new gm
-                        WHERE NULLIF(BTRIM(gm.msisdn), '')
-                                = details.msisdn
+                    CAST(? AS TEXT) IS NULL
+                    OR reconciliation_status = CAST(? AS TEXT)
+                  )
+              AND (
+                    CAST(? AS TEXT) IS NULL
+                    OR (
+                        CAST(? AS TEXT) = 'HAS'
+                        AND EXISTS (
+                            SELECT 1
+                            FROM cdr.vnpt_package_new gm
+                            WHERE NULLIF(BTRIM(gm.msisdn), '')
+                                    = details.msisdn
+                        )
                     )
-                )
-                OR (
-                    CAST(? AS TEXT) = 'NONE'
-                    AND NOT EXISTS (
-                        SELECT 1
-                        FROM cdr.vnpt_package_new gm
-                        WHERE NULLIF(BTRIM(gm.msisdn), '')
-                                = details.msisdn
+                    OR (
+                        CAST(? AS TEXT) = 'NONE'
+                        AND NOT EXISTS (
+                            SELECT 1
+                            FROM cdr.vnpt_package_new gm
+                            WHERE NULLIF(BTRIM(gm.msisdn), '')
+                                    = details.msisdn
+                        )
                     )
-                )
-              )
-        """;
+                  )
+            """;
 
-    Date from = fromDate == null ? null : Date.valueOf(fromDate);
-    Date to = toDate == null ? null : Date.valueOf(toDate);
+        Date from = fromDate == null ? null : Date.valueOf(fromDate);
+        Date to = toDate == null ? null : Date.valueOf(toDate);
 
-    String normalizedMsisdn =
-            (msisdn == null || msisdn.isBlank())
-                    ? null
-                    : "%" + msisdn.trim() + "%";
+        String normalizedMsisdn =
+                (msisdn == null || msisdn.isBlank())
+                        ? null
+                        : "%" + msisdn.trim() + "%";
 
-    String normalizedStatus =
-            (kitStatus == null || kitStatus.isBlank())
-                    ? null
-                    : kitStatus.trim();
+        String normalizedStatus =
+                (kitStatus == null || kitStatus.isBlank())
+                        ? null
+                        : kitStatus.trim();
 
-    String normalizedReconciliation =
-            (reconciliationStatus == null
-                    || reconciliationStatus.isBlank())
-                    ? null
-                    : reconciliationStatus.trim();
+        String normalizedReconciliation =
+                (reconciliationStatus == null
+                        || reconciliationStatus.isBlank())
+                        ? null
+                        : reconciliationStatus.trim();
 
-    String normalizedGoiMoi =
-            (tinhTrangGoiMoi == null || tinhTrangGoiMoi.isBlank())
-                    ? null
-                    : tinhTrangGoiMoi.trim();
+        String normalizedGoiMoi =
+                (tinhTrangGoiMoi == null || tinhTrangGoiMoi.isBlank())
+                        ? null
+                        : tinhTrangGoiMoi.trim();
 
-    Integer result = jdbcTemplate.queryForObject(
-            sql,
-            Integer.class,
+        Integer result = jdbcTemplate.queryForObject(
+                sql,
+                Integer.class,
 
-            // Điều kiện ngày trong CTE goi_moi
-            from, from,
-            to, to,
+                // Điều kiện ngày trong CTE goi_moi
+                from, from,
+                to, to,
 
-            // Điều kiện MSISDN
-            normalizedMsisdn, normalizedMsisdn,
+                // Điều kiện MSISDN
+                normalizedMsisdn, normalizedMsisdn,
 
-            // Điều kiện trạng thái KIT
-            normalizedStatus, normalizedStatus,
+                // Điều kiện trạng thái KIT
+                normalizedStatus, normalizedStatus,
 
-            // Điều kiện trạng thái đối soát
-            normalizedReconciliation, normalizedReconciliation,
+                // Điều kiện trạng thái đối soát
+                normalizedReconciliation, normalizedReconciliation,
 
-            // Điều kiện tình trạng GOI_MOI
-            normalizedGoiMoi,
-            normalizedGoiMoi,
-            normalizedGoiMoi
-    );
+                // Điều kiện tình trạng GOI_MOI
+                normalizedGoiMoi,
+                normalizedGoiMoi,
+                normalizedGoiMoi
+        );
 
-    return result == null ? 0 : result;
-}
+        return result == null ? 0 : result;
+    }
 
     // =====================================================
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
     // ĐẾM TỔNG SỐ NGÀY CỦA BẢNG 1B SAU KHI LỌC
     // =====================================================
 
-    public int countDailySummary(LocalDate fromDate,LocalDate toDate) {
+    public int countDailySummary(LocalDate fromDate, LocalDate toDate) {
 
         String sql = """
             SELECT public.fn_bc_ds_01_1b_count(
@@ -515,10 +515,10 @@ public class BcDs01Repository {
         Date to = toDate == null ? null : Date.valueOf(toDate);
 
         Long result = jdbcTemplate.queryForObject(
-            sql,
-            Long.class,
-            from,
-            to
+                sql,
+                Long.class,
+                from,
+                to
         );
 
         return result == null ? 0 : result.intValue();

@@ -1,18 +1,14 @@
-
 import { useState } from 'react'
 import './Login.css'
 import { login } from '../services/api'
 
-<<<<<<< HEAD
 function Login({ onLoginSuccess, message }) {
-=======
-function Login({ onLoginSuccess }) {
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
   const [tenDangNhap, setTenDangNhap] = useState('admin')
   const [matKhau, setMatKhau] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Xử lý đăng nhập
   async function handleSubmit(event) {
     event.preventDefault()
 
@@ -22,6 +18,7 @@ function Login({ onLoginSuccess }) {
     try {
       const data = await login(tenDangNhap, matKhau)
 
+      // Thông báo cho App.jsx đăng nhập thành công
       onLoginSuccess(data.nguoiDung)
     } catch (err) {
       setError(err.message || 'Đăng nhập thất bại.')
@@ -32,7 +29,10 @@ function Login({ onLoginSuccess }) {
 
   return (
     <main className="login-page">
-      <form className="login-card" onSubmit={handleSubmit}>
+      <form
+        className="login-card"
+        onSubmit={handleSubmit}
+      >
         <div className="login-brand">
           <div className="login-brand-icon">
             <span>P</span>
@@ -45,24 +45,33 @@ function Login({ onLoginSuccess }) {
         </div>
 
         <div className="login-heading">
-          <span className="login-eyebrow">WELCOME BACK</span>
+          <span className="login-eyebrow">
+            WELCOME BACK
+          </span>
+
           <h1>Đăng nhập</h1>
+
           <p>
             Đăng nhập để tiếp tục sử dụng hệ thống báo cáo Pottel.
           </p>
         </div>
 
-<<<<<<< HEAD
+        {/* Thông báo thành công hoặc thông báo từ App.jsx */}
         {message && !error && (
-          <div className="login-success" role="status">
+          <div
+            className="login-success"
+            role="status"
+          >
             <span>{message}</span>
           </div>
         )}
 
-=======
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
+        {/* Thông báo lỗi đăng nhập */}
         {error && (
-          <div className="login-error" role="alert">
+          <div
+            className="login-error"
+            role="alert"
+          >
             <span className="login-error-icon">!</span>
             <span>{error}</span>
           </div>
@@ -71,10 +80,13 @@ function Login({ onLoginSuccess }) {
         <div className="login-form-fields">
           <label className="login-field">
             <span>Tên đăng nhập</span>
+
             <input
               type="text"
               value={tenDangNhap}
-              onChange={(event) => setTenDangNhap(event.target.value)}
+              onChange={(event) =>
+                setTenDangNhap(event.target.value)
+              }
               placeholder="Nhập tên đăng nhập"
               autoComplete="username"
               required
@@ -83,10 +95,13 @@ function Login({ onLoginSuccess }) {
 
           <label className="login-field">
             <span>Mật khẩu</span>
+
             <input
               type="password"
               value={matKhau}
-              onChange={(event) => setMatKhau(event.target.value)}
+              onChange={(event) =>
+                setMatKhau(event.target.value)
+              }
               placeholder="Nhập mật khẩu"
               autoComplete="current-password"
               required
@@ -100,11 +115,15 @@ function Login({ onLoginSuccess }) {
           disabled={loading}
         >
           <span>
-            {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+            {loading
+              ? 'Đang đăng nhập...'
+              : 'Đăng nhập'}
           </span>
 
           {!loading && (
-            <span className="login-submit-arrow">→</span>
+            <span className="login-submit-arrow">
+              →
+            </span>
           )}
         </button>
 

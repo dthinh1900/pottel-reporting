@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 function Header({ currentUser, isAdmin, onLogout }) {
-=======
-function Header({ currentUser, onLogout }) {
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
   const userName =
     typeof currentUser?.tenDangNhap === 'string' &&
     currentUser.tenDangNhap.trim()
@@ -28,10 +24,7 @@ function Header({ currentUser, onLogout }) {
 
         <span className="user-name" title={userName}>
           {userName}
-<<<<<<< HEAD
           {isAdmin ? ' (ADMIN)' : ''}
-=======
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
         </span>
 
         <button

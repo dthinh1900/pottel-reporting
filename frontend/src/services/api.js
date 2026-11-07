@@ -1,10 +1,12 @@
-<<<<<<< HEAD
-// Địa chỉ Backend. Có thể đổi bằng biến VITE_API_URL trong file .env của frontend.
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+// Địa chỉ Backend.
+// Có thể thay đổi bằng biến VITE_API_URL trong file .env của frontend.
+const API_URL = (
+  import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
+).replace(/\/+$/, '')
 
 const TOKEN_KEY = 'access_token'
 
-// Sự kiện phát ra khi Backend báo JWT hết hạn/không hợp lệ (HTTP 401)
+// Sự kiện phát ra khi JWT hết hạn hoặc không hợp lệ (HTTP 401)
 export const AUTH_EXPIRED_EVENT = 'auth-expired'
 
 // Lỗi từ API, có thêm mã trạng thái HTTP
@@ -19,26 +21,23 @@ export class ApiError extends Error {
 // Lấy JWT đã lưu
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY)
-=======
-const API_URL = 'http://localhost:8080/api'
-
-// Lấy JWT đã lưu
-export function getToken() {
-  return localStorage.getItem('access_token')
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
 }
 
-// Xóa JWT
+// Xóa JWT khi đăng xuất
 export function logout() {
-<<<<<<< HEAD
   localStorage.removeItem(TOKEN_KEY)
 }
 
-// Đọc thông báo lỗi {"message": "..."} mà Backend trả về
+// Đọc thông báo lỗi mà Backend trả về
 async function readErrorMessage(response, fallback) {
   try {
     const data = await response.json()
-    if (data && typeof data.message === 'string' && data.message) {
+
+    if (
+      data &&
+      typeof data.message === 'string' &&
+      data.message
+    ) {
       return data.message
     }
   } catch {
@@ -48,7 +47,7 @@ async function readErrorMessage(response, fallback) {
   return fallback
 }
 
-// Gọi API Backend (tự gắn JWT)
+// Gọi API Backend, tự động gắn JWT
 export async function apiFetch(path, options = {}) {
   const token = getToken()
 
@@ -59,13 +58,17 @@ export async function apiFetch(path, options = {}) {
       ...options,
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(token
+          ? { Authorization: `Bearer ${token}` }
+          : {}),
         ...options.headers,
       },
     })
   } catch (error) {
-    // Hủy request chủ động thì để nguyên lỗi cho nơi gọi xử lý
-    if (error.name === 'AbortError') throw error
+    // Nếu request bị hủy chủ động thì giữ nguyên lỗi
+    if (error.name === 'AbortError') {
+      throw error
+    }
 
     throw new ApiError(
       'Không thể kết nối đến máy chủ. Vui lòng kiểm tra Backend đã chạy chưa.',
@@ -73,51 +76,37 @@ export async function apiFetch(path, options = {}) {
     )
   }
 
+  // JWT hết hạn hoặc không hợp lệ
   if (response.status === 401) {
     logout()
-    window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT))
+
+    window.dispatchEvent(
+      new Event(AUTH_EXPIRED_EVENT)
+    )
+
     throw new ApiError(
       'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
       401
     )
   }
 
+  // Xử lý các lỗi HTTP khác
   if (!response.ok) {
     throw new ApiError(
-      await readErrorMessage(response, `Lỗi API: ${response.status}`),
+      await readErrorMessage(
+        response,
+        `Lỗi API: ${response.status}`
+      ),
       response.status
     )
-=======
-  localStorage.removeItem('access_token')
-}
-
-// Gọi API Backend
-export async function apiFetch(path, options = {}) {
-  const token = getToken()
-
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
-  })
-
-  if (response.status === 401) {
-    logout()
-    throw new Error('Phiên đăng nhập đã hết hạn.')
   }
 
-  if (!response.ok) {
-    throw new Error(`Lỗi API: ${response.status}`)
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
-  }
-
+  // Không có nội dung trả về
   if (response.status === 204) {
     return null
   }
 
+  // Xác định kiểu dữ liệu phản hồi
   const contentType = response.headers.get('content-type')
 
   if (contentType?.includes('application/json')) {
@@ -127,12 +116,13 @@ export async function apiFetch(path, options = {}) {
   return response.text()
 }
 
-<<<<<<< HEAD
 // Gọi API bằng phương thức POST với dữ liệu JSON
 export function apiPost(path, body) {
   return apiFetch(path, {
     method: 'POST',
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: body === undefined
+      ? undefined
+      : JSON.stringify(body),
   })
 }
 
@@ -152,51 +142,33 @@ export async function login(tenDangNhap, matKhau) {
       }),
     })
   } catch {
-    throw new Error(
-      'Không thể kết nối đến máy chủ. Vui lòng kiểm tra Backend đã chạy chưa.'
+    throw new ApiError(
+      'Không thể kết nối đến máy chủ. Vui lòng kiểm tra Backend đã chạy chưa.',
+      0
     )
   }
 
   if (!response.ok) {
-    throw new Error(
+    throw new ApiError(
       await readErrorMessage(
         response,
         'Tên đăng nhập hoặc mật khẩu không chính xác.'
-      )
+      ),
+      response.status
     )
-=======
-// Đăng nhập
-export async function login(tenDangNhap, matKhau) {
-  const response = await fetch(`${API_URL}/auth/dang-nhap`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      tenDangNhap,
-      matKhau,
-    }),
-  })
-
-  if (!response.ok) {
-    throw new Error('Tên đăng nhập hoặc mật khẩu không chính xác.')
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
   }
 
   const data = await response.json()
 
   if (!data.token) {
-    throw new Error('Phản hồi đăng nhập không có mã xác thực.')
+    throw new ApiError(
+      'Phản hồi đăng nhập không có mã xác thực.',
+      response.status
+    )
   }
 
-<<<<<<< HEAD
+  // Lưu JWT sau khi đăng nhập thành công
   localStorage.setItem(TOKEN_KEY, data.token)
 
   return data
 }
-=======
-  localStorage.setItem('access_token', data.token)
-
-  return data
-}
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2

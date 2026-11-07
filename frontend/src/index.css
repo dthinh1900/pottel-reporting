@@ -1,3 +1,7 @@
+
+/* Font chữ Be Vietnam Pro */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+
 /* ================================
    GLOBAL RESET
 ================================ */
@@ -15,7 +19,13 @@
 
   --border-color: #dce3ed;
   --accent-blue: #2563eb;
+
+  --font-primary: 'Be Vietnam Pro', sans-serif;
 }
+
+/* ================================
+   RESET
+================================ */
 
 * {
   box-sizing: border-box;
@@ -24,18 +34,61 @@
 html {
   min-width: 320px;
   min-height: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+
   background: var(--pottel-bg);
   color: var(--text-primary);
-  font-family: Arial, Helvetica, sans-serif;
+
+  font-family: var(--font-primary);
   font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
+
+/* ================================
+   TYPOGRAPHY
+================================ */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  color: var(--text-primary);
+  font-family: var(--font-primary);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.3px;
+}
+
+p,
+span,
+label,
+a,
+div {
+  font-family: inherit;
+}
+
+strong,
+b {
+  font-weight: 700;
+}
+
+/* ================================
+   FORM ELEMENTS
+================================ */
 
 button,
 input,
@@ -51,6 +104,16 @@ button {
 button:disabled {
   cursor: not-allowed;
 }
+
+input,
+select,
+textarea {
+  color: var(--text-primary);
+}
+
+/* ================================
+   ROOT
+================================ */
 
 #root {
   min-height: 100vh;

@@ -29,8 +29,6 @@ public class BcDs01Service {
     // BẢNG 1B - TỔNG HỢP THEO NGÀY
     // =========================
 
-<<<<<<< HEAD
-=======
     public List<Map<String, Object>> getDailySummary(
             LocalDate fromDate,
             LocalDate toDate,
@@ -45,7 +43,6 @@ public class BcDs01Service {
         );
     }
 
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
     public int countDailySummary(
             LocalDate fromDate,
             LocalDate toDate) {
@@ -57,8 +54,6 @@ public class BcDs01Service {
     }
 
     // =========================
-<<<<<<< HEAD
-=======
     // BẢNG 1C - CHI TIẾT THUÊ BAO
     // =========================
 
@@ -103,7 +98,6 @@ public class BcDs01Service {
     }
 
     // =========================
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
     // DANH SÁCH TRẠNG THÁI CHO BỘ LỌC
     // =========================
 

@@ -2,10 +2,7 @@ package vn.pottel.reporting.baocao.runner;
 
 import java.util.List;
 import java.util.Map;
-<<<<<<< HEAD
 import java.util.Set;
-=======
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
 import java.util.Arrays;
 import java.sql.Date;
 import java.util.LinkedHashMap;
@@ -43,10 +40,7 @@ public class BaoCaoRunner {
 
     /**
      * Chạy một báo cáo có nhiều bảng kết quả.
-<<<<<<< HEAD
      * Chỉ các bảng có tên trong thamSoTheoBang mới được chạy.
-=======
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
      */
     public KetQuaBaoCao chay(
             String maBaoCao,
@@ -69,12 +63,10 @@ public class BaoCaoRunner {
 
         String noiDungSql = sqlStore.lay(dinhNghia.tepSql());
 
-<<<<<<< HEAD
         Map<String, String> tatCaTruyVan =
                 sqlStore.tachCacBang(noiDungSql);
 
-        // Chỉ chạy những bảng được yêu cầu (có trong thamSoTheoBang),
-        // tránh chạy các truy vấn nặng không cần thiết.
+        // Chỉ chạy những bảng được yêu cầu.
         Map<String, String> cacTruyVan = new LinkedHashMap<>();
 
         for (String maBang : thamSoTheoBang.keySet()) {
@@ -88,12 +80,6 @@ public class BaoCaoRunner {
 
             cacTruyVan.put(maBang, sql);
         }
-=======
-        Map<String, String> cacTruyVan =
-                sqlStore.tachCacBang(noiDungSql);
-
-
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
 
         Map<String, BangKetQua> cacBang =
                 queryRunner.chayNhieuBang(
@@ -110,20 +96,23 @@ public class BaoCaoRunner {
 
     /**
      * Chạy BC-DS-01 với các tham số lấy từ bộ lọc.
-<<<<<<< HEAD
-     * bangCanChay: các mã bảng cần chạy (1B, 1C, 1D).
+     *
+     * bangCanChay: các mã bảng cần chạy (1A, 1B, 1C, 1D).
      */
     public KetQuaBaoCao chayBcDs01(
             ThamSoBaoCao t,
-            Set<String> bangCanChay) {
-=======
-     */
-    public KetQuaBaoCao chayBcDs01(ThamSoBaoCao t) {
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
+            Set<String> bangCanChay
+    ) {
 
         if (t == null) {
             throw new IllegalArgumentException(
                     "Tham số báo cáo không được để trống."
+            );
+        }
+
+        if (bangCanChay == null || bangCanChay.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Danh sách bảng cần chạy không được để trống."
             );
         }
 
@@ -152,7 +141,11 @@ public class BaoCaoRunner {
 
         Map<String, Object[]> thamSoTheoBang = new LinkedHashMap<>();
 
-<<<<<<< HEAD
+        // Bảng 1A: Không cần tham số.
+        if (bangCanChay.contains("1A")) {
+            thamSoTheoBang.put("1A", new Object[]{});
+        }
+
         // Bảng 1B: 4 tham số.
         if (bangCanChay.contains("1B")) {
             thamSoTheoBang.put("1B", new Object[]{
@@ -162,18 +155,6 @@ public class BaoCaoRunner {
                     t.tinhOffset()
             });
         }
-=======
-        // Bảng 1A: Không cần tham số.
-        thamSoTheoBang.put("1A", new Object[]{});
-
-        // Bảng 1B: 4 tham số.
-        thamSoTheoBang.put("1B", new Object[]{
-                tuNgay,
-                denNgay,
-                t.kichThuoc(),
-                t.tinhOffset()
-        });
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
 
         // 13 tham số lọc dùng chung cho bảng 1C và 1D.
         Object[] thamSoLoc = new Object[]{
@@ -197,7 +178,6 @@ public class BaoCaoRunner {
         };
 
         // Bảng 1C: 13 tham số lọc + 2 tham số phân trang.
-<<<<<<< HEAD
         if (bangCanChay.contains("1C")) {
             Object[] thamSo1C = Arrays.copyOf(
                     thamSoLoc,
@@ -214,33 +194,16 @@ public class BaoCaoRunner {
         if (bangCanChay.contains("1D")) {
             thamSoTheoBang.put("1D", thamSoLoc);
         }
-=======
-        Object[] thamSo1C = Arrays.copyOf(
-                thamSoLoc,
-                thamSoLoc.length + 2
-        );
-
-        thamSo1C[13] = t.kichThuoc();
-        thamSo1C[14] = t.tinhOffset();
-
-        thamSoTheoBang.put("1C", thamSo1C);
-
-        // Bảng 1D: 13 tham số để đếm tổng số dòng.
-        thamSoTheoBang.put("1D", thamSoLoc);
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
 
         return chay("BC-DS-01", thamSoTheoBang);
     }
 
-<<<<<<< HEAD
-    // Dữ liệu bảng 1A và các danh sách lọc.
-=======
     /**
      * Lấy tổng số dòng của bảng 1C từ bảng đếm 1D.
      */
     public int demDongBang1C(ThamSoBaoCao t) {
 
-        KetQuaBaoCao ketQua = chayBcDs01(t);
+        KetQuaBaoCao ketQua = chayBcDs01(t, Set.of("1D"));
 
         BangKetQua bangDem = ketQua.layBang("1D");
 
@@ -255,15 +218,18 @@ public class BaoCaoRunner {
                 : ((Number) giaTri).intValue();
     }
 
-    // Các phương thức cũ được giữ lại.
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
+    // =========================
+    // BẢNG 1A - TỔNG QUAN
+    // =========================
 
     public Map<String, Object> chayTongQuan() {
         return bcDs01Service.getSummary();
     }
 
-<<<<<<< HEAD
-=======
+    // =========================
+    // BẢNG 1B - TỔNG HỢP THEO NGÀY
+    // =========================
+
     public List<Map<String, Object>> chayBang1B(ThamSoBaoCao t) {
         return bcDs01Service.getDailySummary(
                 t.tuNgay(),
@@ -273,7 +239,6 @@ public class BaoCaoRunner {
         );
     }
 
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
     public int demSoNgayBang1B(ThamSoBaoCao t) {
         return bcDs01Service.countDailySummary(
                 t.tuNgay(),
@@ -281,8 +246,10 @@ public class BaoCaoRunner {
         );
     }
 
-<<<<<<< HEAD
-=======
+    // =========================
+    // BẢNG 1C - CHI TIẾT THUÊ BAO
+    // =========================
+
     public List<Map<String, Object>> chayBang1C(ThamSoBaoCao t) {
         return bcDs01Service.getSubscriberDetails(
                 t.tuNgay(),
@@ -296,7 +263,17 @@ public class BaoCaoRunner {
         );
     }
 
->>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
+    // Chạy toàn bộ các bảng báo cáo BC-DS-01
+public KetQuaBaoCao chayBcDs01(ThamSoBaoCao thamSo) {
+    return chayBcDs01(
+            thamSo,
+            Set.of("1A", "1B", "1C", "1D")
+    );
+}
+    // =========================
+    // DANH SÁCH TRẠNG THÁI BỘ LỌC
+    // =========================
+
     public List<String> layDanhSachTrangThaiKit() {
         return bcDs01Service.getKitStatuses();
     }
