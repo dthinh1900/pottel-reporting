@@ -31,11 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
 ### Environment and secrets ###
 .env
 .env.*
 !.env.example
-
 application-local.properties
 application-secret.properties
 
@@ -46,12 +46,14 @@ application-secret.properties
 *.dump
 *.backup
 
-# Node.js
+### Node.js ###
+node_modules/
 frontend/node_modules/
+
+### Build output ###
+dist/
 frontend/dist/
-
-# Vite
-**/.vite/
-
-# Java
 target/
+
+### Vite ###
+**/.vite/
