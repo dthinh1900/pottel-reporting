@@ -1,0 +1,306 @@
+/* ================================
+   POTTEL REPORTING - MAIN LAYOUT
+================================ */
+
+/* KHUNG TỔNG THỂ */
+
+.main-layout {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--pottel-bg);
+}
+
+/* ================================
+   SIDEBAR
+================================ */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  min-width: 250px;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--pottel-navy);
+  color: var(--pottel-white);
+}
+
+/* Logo */
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  flex-shrink: 0;
+  padding: 12px;
+  overflow: hidden;
+  background: var(--pottel-navy);
+  border-bottom: 1px solid rgba(255, 196, 0, 0.25);
+}
+
+.sidebar-brand-image {
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 8px;
+  transform: scale(1.15);
+  transform-origin: center;
+}
+
+/* Menu */
+
+.sidebar-menu {
+  flex: 1;
+  min-height: 0;
+  padding: 22px 12px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.sidebar-heading {
+  margin: 18px 10px 10px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #e2e8f0;
+  text-align: left;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-item:hover {
+  background: rgba(255, 196, 0, 0.15);
+  color: var(--pottel-yellow);
+}
+
+.sidebar-item.active {
+  background: var(--pottel-yellow);
+  color: var(--pottel-navy);
+  font-weight: 700;
+}
+
+.sidebar-icon {
+  width: 20px;
+  flex-shrink: 0;
+  color: inherit;
+  font-size: 18px;
+  text-align: center;
+}
+
+/* Chân sidebar */
+
+.sidebar-footer {
+  flex-shrink: 0;
+  padding: 18px 20px;
+  border-top: 1px solid rgba(255, 196, 0, 0.25);
+  background: var(--pottel-navy);
+  color: var(--pottel-white);
+  font-size: 13px;
+}
+
+.sidebar-footer span {
+  display: block;
+  margin-top: 5px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* ================================
+   MAIN CONTENT
+================================ */
+
+.main-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--pottel-bg);
+}
+
+/* Header */
+
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+  flex-shrink: 0;
+  padding: 0 28px;
+  border-bottom: 3px solid var(--pottel-yellow);
+  background: var(--pottel-white);
+}
+
+/* Thương hiệu */
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.header-brand-name {
+  color: var(--pottel-navy);
+  font-size: 19px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+.header-brand-divider {
+  color: var(--pottel-orange);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.header-brand-description {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* Tài khoản */
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--pottel-yellow);
+  color: var(--pottel-navy);
+  font-weight: 800;
+}
+
+.user-name {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.header-logout {
+  padding: 9px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  background: var(--pottel-white);
+  color: var(--pottel-navy);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.header-logout:hover {
+  background: #fff7d6;
+  border-color: var(--pottel-yellow);
+}
+
+/* Nội dung cuộn độc lập */
+
+.page-content {
+  flex: 1;
+  min-height: 0;
+  padding: 28px;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 190px;
+    min-width: 190px;
+  }
+
+  .main-header {
+    padding: 0 14px;
+  }
+
+  .page-content {
+    padding: 16px;
+  }
+
+  .user-name {
+    display: none;
+  }
+
+  .header-brand-name {
+    font-size: 16px;
+  }
+
+  .header-brand-description {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 150px;
+    min-width: 150px;
+  }
+
+  .sidebar-item {
+    gap: 8px;
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .sidebar-heading {
+    font-size: 10px;
+  }
+
+  .main-header {
+    padding: 0 10px;
+  }
+
+  .header-brand {
+    gap: 5px;
+  }
+
+  .header-brand-name {
+    font-size: 14px;
+  }
+
+  .header-brand-description {
+    font-size: 10px;
+  }
+
+  .header-user {
+    gap: 7px;
+  }
+
+  .header-logout {
+    padding: 8px;
+    font-size: 11px;
+  }
+
+  .page-content {
+    padding: 12px;
+  }
+}

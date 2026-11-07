@@ -1,0 +1,166 @@
+/* Style riêng của trang báo cáo BC-DS-01 */
+
+/* ========================================
+   OVERVIEW
+======================================== */
+
+.overview {
+  margin-bottom: 40px;
+}
+
+.overview h2,
+.section-heading h2 {
+  margin: 0 0 7px;
+  color: var(--pottel-navy);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ========================================
+   SUMMARY CARDS
+======================================== */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  margin-top: 18px;
+}
+
+.summary-card {
+  min-height: 105px;
+  padding: 16px;
+  background: var(--pottel-white);
+  border: 1px solid var(--border-color);
+  border-top: 3px solid var(--accent);
+  border-radius: 10px;
+  color: var(--text-primary);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.card-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 29px;
+  height: 29px;
+  border-radius: 7px;
+  background: var(--light);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.summary-card > strong {
+  display: block;
+  margin-top: 10px;
+  color: var(--accent);
+  font-size: 25px;
+}
+
+/* Card accent colors */
+
+.blue {
+  --accent: #D99B00;
+  --light: #FFF2C2;
+}
+
+.purple {
+  --accent: #7953B5;
+  --light: #EEE7FA;
+}
+
+.green {
+  --accent: #16865C;
+  --light: #D9F4E7;
+}
+
+.cyan {
+  --accent: #07859B;
+  --light: #D8F4F7;
+}
+
+.red {
+  --accent: #DC4545;
+  --light: #FDE3E3;
+}
+
+.orange {
+  --accent: #E97816;
+  --light: #FDEBD9;
+}
+
+.pink {
+  --accent: #C83E79;
+  --light: #F9E1ED;
+}
+
+/* ========================================
+   REPORT SECTION
+======================================== */
+
+.report-section {
+  padding-top: 28px;
+  border-top: 1px solid var(--border-color);
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tabs button {
+  padding: 10px 15px;
+  background: var(--pottel-white);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  transition: 0.2s;
+}
+
+.tabs button:hover {
+  border-color: var(--pottel-yellow);
+  color: var(--pottel-navy);
+}
+
+.tabs button.active {
+  background: var(--pottel-navy);
+  border-color: var(--pottel-navy);
+  color: var(--pottel-yellow);
+}
+
+
+.report-actions-error {
+  margin-bottom: 18px;
+}
+
+@media (max-width: 1000px) {
+  .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .section-heading { align-items: flex-start; flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+  .summary-grid { grid-template-columns: 1fr; }
+  .report-heading h1 { font-size: 24px; }
+  .tabs { width: 100%; }
+  .tabs button { flex: 1; }
+}

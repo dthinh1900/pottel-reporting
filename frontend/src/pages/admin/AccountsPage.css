@@ -1,0 +1,54 @@
+/* Style riêng của trang Quản lý tài khoản */
+
+.account-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.account-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(300px, 100%);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.account-form input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+}
+
+.account-form input:focus {
+  outline: none;
+  border-color: var(--pottel-orange);
+  box-shadow: 0 0 0 3px rgba(255, 138, 0, 0.12);
+}
+
+.account-name {
+  font-weight: 700;
+  color: var(--pottel-navy);
+}
+
+.current-account {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.table-action-button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.table-action-button.lock   { color: #B42318; border-color: #F5B5B5; }
+.table-action-button.unlock { color: #0F5C40; border-color: #A9DFC5; }
+.table-action-button:hover:not(:disabled) { background: #F8FAFC; }
+.table-action-button:disabled { opacity: 0.5; }
