@@ -1,0 +1,181 @@
+<div th:fragment="tables">
+
+    <!-- THÔNG BÁO LỖI KHOẢNG NGÀY -->
+    <div
+        th:if="${dateValidationError != null}"
+        class="alert alert-danger mb-3"
+        role="alert"
+        th:text="${dateValidationError}">
+    </div>
+
+    <!-- BẢNG 1B -->
+    <div th:if="${selectedBc == '1B'}">
+        <div class="report-table-card">
+
+            <h4 class="report-table-title">
+                Bảng 1B – Tổng hợp GOI_MOI theo ngày
+            </h4>
+
+            <p class="report-table-description">
+                Số liệu được tổng hợp theo ngày ghi nhận GOI_MOI trên CDR.
+            </p>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover align-middle report-table">
+                    <thead>
+                        <tr>
+                            <th>Ngày ghi nhận</th>
+                            <th>Sự kiện GOI_MOI</th>
+                            <th>MSISDN duy nhất</th>
+                            <th>Sự kiện khớp KIT</th>
+                            <th>Sự kiện không tìm thấy KIT</th>
+                            <th>Sự kiện thiếu ngày đăng ký</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="row : ${dailySummary}">
+                            <td th:text="${row.event_date}"></td>
+                            <td th:text="${row.event_count}"></td>
+                            <td th:text="${row.unique_msisdn}"></td>
+                            <td th:text="${row.matched_events}"></td>
+                            <td th:text="${row.orphan_events}"></td>
+                            <td th:text="${row.missing_registed_date_events}"></td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(dailySummary)}">
+                            <td colspan="6" class="text-center empty-row">
+                                Không có dữ liệu phù hợp với điều kiện lọc.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- BẢNG 1C -->
+    <div th:if="${selectedBc == '1C'}">
+        <div class="report-table-card">
+
+            <h4 class="report-table-title">
+                Bảng 1C – Chi tiết thuê bao
+            </h4>
+
+            <p class="report-table-description">
+                Mỗi MSISDN được hiển thị một dòng, tổng hợp từ KIT và GOI_MOI.
+            </p>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover table-sm align-middle report-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>MSISDN</th>
+                            <th>Trạng thái KIT</th>
+                            <th>Ngày đăng ký</th>
+                            <th>Số dòng KIT</th>
+                            <th>Số sự kiện GOI_MOI</th>
+                            <th>Ngày GOI_MOI đầu tiên</th>
+                            <th>Ngày GOI_MOI cuối cùng</th>
+                            <th>Tình trạng đối soát</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr th:each="row, stat : ${subscriberDetails}">
+                            <td th:text="${(currentPage - 1) * pageSize + stat.count}"></td>
+
+                            <td class="fw-semibold text-primary"
+                                th:text="${row.msisdn}">
+                            </td>
+
+                            <td th:text="${row.kit_status != null ? row.kit_status : '-'}"></td>
+
+                            <td th:text="${row.registed_date != null ? row.registed_date : 'Thiếu'}"></td>
+
+                            <td th:text="${row.kit_row_count}"></td>
+                            <td th:text="${row.event_count}"></td>
+
+                            <td th:text="${row.first_event_date != null ? row.first_event_date : '-'}"></td>
+
+                            <td th:text="${row.last_event_date != null ? row.last_event_date : '-'}"></td>
+
+                            <td>
+                                <span
+                                    th:text="${row.reconciliation_status}"
+                                    th:class="${row.reconciliation_status == 'Khớp KIT'
+                                        ? 'report-badge report-badge-success'
+                                        : (row.reconciliation_status == 'Không tìm thấy KIT'
+                                            ? 'report-badge report-badge-danger'
+                                            : 'report-badge report-badge-warning')}">
+                                </span>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(subscriberDetails)}">
+                            <td colspan="9" class="text-center empty-row">
+                                Không có dữ liệu phù hợp với điều kiện lọc.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- THANH PHÂN TRANG -->
+    <div class="report-pagination d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+        <div class="pagination-info">
+            Tổng số dòng:
+            <strong th:text="${totalRows}">0</strong>
+        </div>
+
+        <div class="pagination-controls d-flex flex-wrap align-items-center gap-2">
+
+            <label for="pageSizeSelect" class="mb-0">
+                Số dòng/trang:
+            </label>
+
+            <select
+                id="pageSizeSelect"
+                class="form-select form-select-sm"
+                style="width: auto;"
+                data-page-size>
+
+                <option value="10" th:selected="${pageSize == 10}">10</option>
+                <option value="20" th:selected="${pageSize == 20}">20</option>
+                <option value="50" th:selected="${pageSize == 50}">50</option>
+                <option value="100" th:selected="${pageSize == 100}">100</option>
+            </select>
+
+            <button
+                type="button"
+                class="btn btn-outline-primary btn-sm"
+                data-page="prev"
+                th:disabled="${currentPage <= 1}">
+                Trước
+            </button>
+
+            <span class="current-page">
+                Trang
+                <strong th:text="${currentPage}">1</strong>
+                /
+                <strong th:text="${totalPages}">1</strong>
+            </span>
+
+            <button
+                type="button"
+                class="btn btn-outline-primary btn-sm"
+                data-page="next"
+                th:disabled="${currentPage >= totalPages}">
+                Sau
+            </button>
+
+        </div>
+    </div>
+
+</div>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package vn.pottel.reporting.controller;
 
 import java.time.LocalDate;
@@ -6,6 +7,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+=======
+
+package vn.pottel.reporting.controller;
+
+import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.Map;
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -15,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+<<<<<<< HEAD
 import vn.pottel.reporting.baocao.model.KetQuaBaoCao;
 import vn.pottel.reporting.baocao.model.ThamSoBaoCao;
 import vn.pottel.reporting.baocao.runner.BaoCaoRunner;
@@ -25,16 +35,26 @@ import vn.pottel.reporting.data.BangKetQua;
  *
  * Lỗi đầu vào trả HTTP 400 kèm {"message": "..."} (xem GlobalExceptionHandler).
  */
+=======
+import vn.pottel.reporting.baocao.model.ThamSoBaoCao;
+import vn.pottel.reporting.baocao.model.KetQuaBaoCao;
+import vn.pottel.reporting.baocao.runner.BaoCaoRunner;
+import vn.pottel.reporting.data.BangKetQua;
+
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
 @RestController
 @RequestMapping("/api/reports")
 public class ReportDataApiController {
 
+<<<<<<< HEAD
     private static final Set<Integer> PAGE_SIZES = Set.of(10, 20, 50, 100);
     private static final Set<String> GOI_MOI_STATUSES = Set.of("HAS", "NONE");
     private static final ZoneId VN_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
     private static final int MAX_MSISDN_LENGTH = 30;
     private static final int MAX_TEXT_LENGTH = 200;
 
+=======
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
     private final BaoCaoRunner runner;
 
     public ReportDataApiController(BaoCaoRunner runner) {
@@ -59,6 +79,7 @@ public class ReportDataApiController {
             @RequestParam(required = false) String goiMoiStatus,
 
             @RequestParam(defaultValue = "1") int page,
+<<<<<<< HEAD
             @RequestParam(defaultValue = "20") int pageSize,
 
             // false: chỉ lấy dữ liệu bảng, bỏ qua bảng 1A và danh sách lọc
@@ -71,6 +92,26 @@ public class ReportDataApiController {
                 fromDate, toDate, msisdn, kitStatus,
                 reconciliationStatus, goiMoiStatus, page, pageSize
         );
+=======
+            @RequestParam(defaultValue = "20") int pageSize
+    ) {
+        if (fromDate != null && toDate != null
+                && fromDate.isAfter(toDate)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Ngày bắt đầu phải nhỏ hơn ngày kết thúc."
+            );
+        }
+
+        if (page < 1 || pageSize < 1 || pageSize > 100) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Thông số phân trang không hợp lệ."
+            );
+        }
+
+        String selectedBc = "1C".equalsIgnoreCase(bc) ? "1C" : "1B";
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
 
         ThamSoBaoCao thamSo = new ThamSoBaoCao(
                 fromDate,
@@ -85,6 +126,7 @@ public class ReportDataApiController {
 
         Map<String, Object> response = new LinkedHashMap<>();
 
+<<<<<<< HEAD
         if (includeMeta) {
             // Bảng 1A: Tổng quan và danh sách lựa chọn cho bộ lọc
             response.put("summary", runner.chayTongQuan());
@@ -98,14 +140,36 @@ public class ReportDataApiController {
         response.put("selectedBc", selectedBc);
         response.put("currentPage", thamSo.trang());
         response.put("pageSize", thamSo.kichThuoc());
+=======
+        // Bảng 1A: Tổng quan
+        response.put("summary", runner.chayTongQuan());
+
+        // Danh sách lựa chọn cho bộ lọc
+        response.put("kitStatuses", runner.layDanhSachTrangThaiKit());
+        response.put(
+                "reconciliationStatuses",
+                runner.layDanhSachTrangThaiDoiSoat()
+        );
+
+        // Thông tin bộ lọc và phân trang
+        response.put("selectedBc", selectedBc);
+        response.put("currentPage", page);
+        response.put("pageSize", pageSize);
+
+        // Chạy báo cáo
+        KetQuaBaoCao ketQua = runner.chayBcDs01(thamSo);
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
 
         int totalRows;
 
         if ("1B".equals(selectedBc)) {
+<<<<<<< HEAD
             totalRows = runner.demSoNgayBang1B(thamSo);
             kiemTraTrang(thamSo, totalRows);
 
             KetQuaBaoCao ketQua = runner.chayBcDs01(thamSo, Set.of("1B"));
+=======
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
             BangKetQua bang = ketQua.layBang("1B");
 
             if (bang == null) {
@@ -117,10 +181,16 @@ public class ReportDataApiController {
             response.put("dailySummary", bang.dong());
             response.put("subscriberDetails", null);
 
+<<<<<<< HEAD
         } else {
             KetQuaBaoCao ketQua =
                     runner.chayBcDs01(thamSo, Set.of("1C", "1D"));
 
+=======
+            totalRows = runner.demSoNgayBang1B(thamSo);
+
+        } else {
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
             BangKetQua bang = ketQua.layBang("1C");
             BangKetQua bangDem = ketQua.layBang("1D");
 
@@ -130,6 +200,7 @@ public class ReportDataApiController {
                 );
             }
 
+<<<<<<< HEAD
             totalRows = layTongSoDong(bangDem);
             kiemTraTrang(thamSo, totalRows);
 
@@ -235,4 +306,29 @@ public class ReportDataApiController {
     private ResponseStatusException badRequest(String message) {
         return new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
     }
+=======
+            response.put("dailySummary", null);
+            response.put("subscriberDetails", bang.dong());
+
+            if (bangDem == null || bangDem.dong().isEmpty()) {
+                totalRows = 0;
+            } else {
+                Object value = bangDem.dong().get(0).get("total_rows");
+                totalRows = value == null
+                        ? 0
+                        : ((Number) value).intValue();
+            }
+        }
+
+        int totalPages = Math.max(
+                1,
+                (int) Math.ceil((double) totalRows / pageSize)
+        );
+
+        response.put("totalRows", totalRows);
+        response.put("totalPages", totalPages);
+
+        return response;
+    }
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
 }

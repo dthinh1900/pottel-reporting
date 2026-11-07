@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Địa chỉ Backend. Có thể đổi bằng biến VITE_API_URL trong file .env của frontend.
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
@@ -18,10 +19,18 @@ export class ApiError extends Error {
 // Lấy JWT đã lưu
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY)
+=======
+const API_URL = 'http://localhost:8080/api'
+
+// Lấy JWT đã lưu
+export function getToken() {
+  return localStorage.getItem('access_token')
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
 }
 
 // Xóa JWT
 export function logout() {
+<<<<<<< HEAD
   localStorage.removeItem(TOKEN_KEY)
 }
 
@@ -78,6 +87,31 @@ export async function apiFetch(path, options = {}) {
       await readErrorMessage(response, `Lỗi API: ${response.status}`),
       response.status
     )
+=======
+  localStorage.removeItem('access_token')
+}
+
+// Gọi API Backend
+export async function apiFetch(path, options = {}) {
+  const token = getToken()
+
+  const response = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+  })
+
+  if (response.status === 401) {
+    logout()
+    throw new Error('Phiên đăng nhập đã hết hạn.')
+  }
+
+  if (!response.ok) {
+    throw new Error(`Lỗi API: ${response.status}`)
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
   }
 
   if (response.status === 204) {
@@ -93,6 +127,7 @@ export async function apiFetch(path, options = {}) {
   return response.text()
 }
 
+<<<<<<< HEAD
 // Gọi API bằng phương thức POST với dữ liệu JSON
 export function apiPost(path, body) {
   return apiFetch(path, {
@@ -129,6 +164,23 @@ export async function login(tenDangNhap, matKhau) {
         'Tên đăng nhập hoặc mật khẩu không chính xác.'
       )
     )
+=======
+// Đăng nhập
+export async function login(tenDangNhap, matKhau) {
+  const response = await fetch(`${API_URL}/auth/dang-nhap`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      tenDangNhap,
+      matKhau,
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error('Tên đăng nhập hoặc mật khẩu không chính xác.')
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
   }
 
   const data = await response.json()
@@ -137,7 +189,14 @@ export async function login(tenDangNhap, matKhau) {
     throw new Error('Phản hồi đăng nhập không có mã xác thực.')
   }
 
+<<<<<<< HEAD
   localStorage.setItem(TOKEN_KEY, data.token)
 
   return data
 }
+=======
+  localStorage.setItem('access_token', data.token)
+
+  return data
+}
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2

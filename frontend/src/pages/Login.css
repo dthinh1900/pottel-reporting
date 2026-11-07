@@ -319,6 +319,7 @@
     bottom: 8px;
     font-size: 10px;
   }
+<<<<<<< HEAD
 }
 /* Thông báo thành công / thông tin ở trang đăng nhập (ví dụ: đã đăng xuất) */
 .login-success {
@@ -333,3 +334,6 @@
   color: #0F5C40;
   font-size: 13px;
 }
+=======
+}
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2

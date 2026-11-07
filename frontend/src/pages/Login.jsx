@@ -3,7 +3,11 @@ import { useState } from 'react'
 import './Login.css'
 import { login } from '../services/api'
 
+<<<<<<< HEAD
 function Login({ onLoginSuccess, message }) {
+=======
+function Login({ onLoginSuccess }) {
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
   const [tenDangNhap, setTenDangNhap] = useState('admin')
   const [matKhau, setMatKhau] = useState('')
   const [loading, setLoading] = useState(false)
@@ -48,12 +52,15 @@ function Login({ onLoginSuccess, message }) {
           </p>
         </div>
 
+<<<<<<< HEAD
         {message && !error && (
           <div className="login-success" role="status">
             <span>{message}</span>
           </div>
         )}
 
+=======
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
         {error && (
           <div className="login-error" role="alert">
             <span className="login-error-icon">!</span>

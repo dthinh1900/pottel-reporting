@@ -1,4 +1,5 @@
 import logo from '../../assets/pottel-logo.png'
+<<<<<<< HEAD
 import { REPORT_CATALOG } from '../../config/reports'
 
 const ACTIVE_REPORTS = REPORT_CATALOG.filter(
@@ -6,6 +7,10 @@ const ACTIVE_REPORTS = REPORT_CATALOG.filter(
 )
 
 function Sidebar({ currentPath, isAdmin, onNavigate }) {
+=======
+
+function Sidebar({ currentPage, onNavigate }) {
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -21,8 +26,13 @@ function Sidebar({ currentPath, isAdmin, onNavigate }) {
 
         <button
           type="button"
+<<<<<<< HEAD
           className={`sidebar-item ${currentPath === '/' ? 'active' : ''}`}
           onClick={() => onNavigate('/')}
+=======
+          className={`sidebar-item ${currentPage === 'home' ? 'active' : ''}`}
+          onClick={() => onNavigate('home')}
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
         >
           <span className="sidebar-icon">⌂</span>
           <span>Trang chủ</span>
@@ -30,6 +40,7 @@ function Sidebar({ currentPath, isAdmin, onNavigate }) {
 
         <p className="sidebar-heading">BÁO CÁO</p>
 
+<<<<<<< HEAD
         {ACTIVE_REPORTS.map((report) => (
           <button
             key={report.code}
@@ -60,6 +71,16 @@ function Sidebar({ currentPath, isAdmin, onNavigate }) {
             </button>
           </>
         )}
+=======
+        <button
+          type="button"
+          className={`sidebar-item ${currentPage === 'report' ? 'active' : ''}`}
+          onClick={() => onNavigate('report')}
+        >
+          <span className="sidebar-icon">▤</span>
+          <span>Đối soát KIT và GOI_MOI</span>
+        </button>
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
       </nav>
 
       <div className="sidebar-footer">
@@ -70,4 +91,8 @@ function Sidebar({ currentPath, isAdmin, onNavigate }) {
   )
 }
 
+<<<<<<< HEAD
 export default Sidebar
+=======
+export default Sidebar
+>>>>>>> e793bc8e50a86953ab83310ebe6cc50ed425b7f2
