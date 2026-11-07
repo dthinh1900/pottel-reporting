@@ -26,20 +26,14 @@
 
     <dependencies>
 
-        <!-- Xu ly request HTTP va dieu huong trang web -->
+        <!-- Xu ly request HTTP va cung cap REST API -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
 
-        <!-- Hien thi giao dien HTML bang Thymeleaf -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
-
         
-        <!-- Bao ve ung dung va xu ly dang nhap, dang xuat -->
+        <!-- Bao ve ung dung: xac thuc JWT va phan quyen -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -66,13 +60,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Thu vien kiem thu Thymeleaf -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Thu vien kiem thu Spring MVC -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -80,10 +67,6 @@
             <scope>test</scope>
         </dependency>
         
-        <dependency>
-            <groupId>org.thymeleaf.extras</groupId>
-            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
-        </dependency>
         <!-- Thu vien tao va xac minh JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

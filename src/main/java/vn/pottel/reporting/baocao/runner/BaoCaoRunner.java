@@ -2,6 +2,7 @@ package vn.pottel.reporting.baocao.runner;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Arrays;
 import java.sql.Date;
 import java.util.LinkedHashMap;
@@ -39,6 +40,7 @@ public class BaoCaoRunner {
 
     /**
      * Chạy một báo cáo có nhiều bảng kết quả.
+     * Chỉ các bảng có tên trong thamSoTheoBang mới được chạy.
      */
     public KetQuaBaoCao chay(
             String maBaoCao,
@@ -61,10 +63,24 @@ public class BaoCaoRunner {
 
         String noiDungSql = sqlStore.lay(dinhNghia.tepSql());
 
-        Map<String, String> cacTruyVan =
+        Map<String, String> tatCaTruyVan =
                 sqlStore.tachCacBang(noiDungSql);
 
+        // Chỉ chạy những bảng được yêu cầu (có trong thamSoTheoBang),
+        // tránh chạy các truy vấn nặng không cần thiết.
+        Map<String, String> cacTruyVan = new LinkedHashMap<>();
 
+        for (String maBang : thamSoTheoBang.keySet()) {
+            String sql = tatCaTruyVan.get(maBang);
+
+            if (sql == null) {
+                throw new IllegalArgumentException(
+                        "Không tìm thấy bảng SQL: " + maBang
+                );
+            }
+
+            cacTruyVan.put(maBang, sql);
+        }
 
         Map<String, BangKetQua> cacBang =
                 queryRunner.chayNhieuBang(
@@ -81,8 +97,11 @@ public class BaoCaoRunner {
 
     /**
      * Chạy BC-DS-01 với các tham số lấy từ bộ lọc.
+     * bangCanChay: các mã bảng cần chạy (1B, 1C, 1D).
      */
-    public KetQuaBaoCao chayBcDs01(ThamSoBaoCao t) {
+    public KetQuaBaoCao chayBcDs01(
+            ThamSoBaoCao t,
+            Set<String> bangCanChay) {
 
         if (t == null) {
             throw new IllegalArgumentException(
@@ -115,16 +134,15 @@ public class BaoCaoRunner {
 
         Map<String, Object[]> thamSoTheoBang = new LinkedHashMap<>();
 
-        // Bảng 1A: Không cần tham số.
-        thamSoTheoBang.put("1A", new Object[]{});
-
         // Bảng 1B: 4 tham số.
-        thamSoTheoBang.put("1B", new Object[]{
-                tuNgay,
-                denNgay,
-                t.kichThuoc(),
-                t.tinhOffset()
-        });
+        if (bangCanChay.contains("1B")) {
+            thamSoTheoBang.put("1B", new Object[]{
+                    tuNgay,
+                    denNgay,
+                    t.kichThuoc(),
+                    t.tinhOffset()
+            });
+        }
 
         // 13 tham số lọc dùng chung cho bảng 1C và 1D.
         Object[] thamSoLoc = new Object[]{
@@ -148,74 +166,36 @@ public class BaoCaoRunner {
         };
 
         // Bảng 1C: 13 tham số lọc + 2 tham số phân trang.
-        Object[] thamSo1C = Arrays.copyOf(
-                thamSoLoc,
-                thamSoLoc.length + 2
-        );
+        if (bangCanChay.contains("1C")) {
+            Object[] thamSo1C = Arrays.copyOf(
+                    thamSoLoc,
+                    thamSoLoc.length + 2
+            );
 
-        thamSo1C[13] = t.kichThuoc();
-        thamSo1C[14] = t.tinhOffset();
+            thamSo1C[13] = t.kichThuoc();
+            thamSo1C[14] = t.tinhOffset();
 
-        thamSoTheoBang.put("1C", thamSo1C);
+            thamSoTheoBang.put("1C", thamSo1C);
+        }
 
-        // Bảng 1D: 13 tham số để đếm tổng số dòng.
-        thamSoTheoBang.put("1D", thamSoLoc);
+        // Bảng 1D: 13 tham số để đếm tổng số dòng của 1C.
+        if (bangCanChay.contains("1D")) {
+            thamSoTheoBang.put("1D", thamSoLoc);
+        }
 
         return chay("BC-DS-01", thamSoTheoBang);
     }
 
-    /**
-     * Lấy tổng số dòng của bảng 1C từ bảng đếm 1D.
-     */
-    public int demDongBang1C(ThamSoBaoCao t) {
-
-        KetQuaBaoCao ketQua = chayBcDs01(t);
-
-        BangKetQua bangDem = ketQua.layBang("1D");
-
-        if (bangDem == null || bangDem.dong().isEmpty()) {
-            return 0;
-        }
-
-        Object giaTri = bangDem.dong().get(0).get("total_rows");
-
-        return giaTri == null
-                ? 0
-                : ((Number) giaTri).intValue();
-    }
-
-    // Các phương thức cũ được giữ lại.
+    // Dữ liệu bảng 1A và các danh sách lọc.
 
     public Map<String, Object> chayTongQuan() {
         return bcDs01Service.getSummary();
-    }
-
-    public List<Map<String, Object>> chayBang1B(ThamSoBaoCao t) {
-        return bcDs01Service.getDailySummary(
-                t.tuNgay(),
-                t.denNgay(),
-                t.kichThuoc(),
-                t.tinhOffset()
-        );
     }
 
     public int demSoNgayBang1B(ThamSoBaoCao t) {
         return bcDs01Service.countDailySummary(
                 t.tuNgay(),
                 t.denNgay()
-        );
-    }
-
-    public List<Map<String, Object>> chayBang1C(ThamSoBaoCao t) {
-        return bcDs01Service.getSubscriberDetails(
-                t.tuNgay(),
-                t.denNgay(),
-                t.msisdn(),
-                t.trangThaiKit(),
-                t.trangThaiDoiSoat(),
-                t.tinhTrangGoiMoi(),
-                t.kichThuoc(),
-                t.tinhOffset()
         );
     }
 

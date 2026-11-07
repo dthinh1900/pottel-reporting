@@ -1,6 +1,11 @@
 import logo from '../../assets/pottel-logo.png'
+import { REPORT_CATALOG } from '../../config/reports'
 
-function Sidebar({ currentPage, onNavigate }) {
+const ACTIVE_REPORTS = REPORT_CATALOG.filter(
+  (report) => report.status === 'active'
+)
+
+function Sidebar({ currentPath, isAdmin, onNavigate }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -16,8 +21,8 @@ function Sidebar({ currentPage, onNavigate }) {
 
         <button
           type="button"
-          className={`sidebar-item ${currentPage === 'home' ? 'active' : ''}`}
-          onClick={() => onNavigate('home')}
+          className={`sidebar-item ${currentPath === '/' ? 'active' : ''}`}
+          onClick={() => onNavigate('/')}
         >
           <span className="sidebar-icon">⌂</span>
           <span>Trang chủ</span>
@@ -25,14 +30,36 @@ function Sidebar({ currentPage, onNavigate }) {
 
         <p className="sidebar-heading">BÁO CÁO</p>
 
-        <button
-          type="button"
-          className={`sidebar-item ${currentPage === 'report' ? 'active' : ''}`}
-          onClick={() => onNavigate('report')}
-        >
-          <span className="sidebar-icon">▤</span>
-          <span>Đối soát KIT và GOI_MOI</span>
-        </button>
+        {ACTIVE_REPORTS.map((report) => (
+          <button
+            key={report.code}
+            type="button"
+            className={`sidebar-item ${
+              currentPath === report.path ? 'active' : ''
+            }`}
+            onClick={() => onNavigate(report.path)}
+          >
+            <span className="sidebar-icon">▤</span>
+            <span>{report.menuLabel}</span>
+          </button>
+        ))}
+
+        {isAdmin && (
+          <>
+            <p className="sidebar-heading">QUẢN TRỊ</p>
+
+            <button
+              type="button"
+              className={`sidebar-item ${
+                currentPath === '/admin/accounts' ? 'active' : ''
+              }`}
+              onClick={() => onNavigate('/admin/accounts')}
+            >
+              <span className="sidebar-icon">☺</span>
+              <span>Quản lý tài khoản</span>
+            </button>
+          </>
+        )}
       </nav>
 
       <div className="sidebar-footer">

@@ -29,20 +29,6 @@ public class BcDs01Service {
     // BẢNG 1B - TỔNG HỢP THEO NGÀY
     // =========================
 
-    public List<Map<String, Object>> getDailySummary(
-            LocalDate fromDate,
-            LocalDate toDate,
-            int pageSize,
-            int offset) {
-
-        return repository.getDailySummary(
-                fromDate,
-                toDate,
-                pageSize,
-                offset
-        );
-    }
-
     public int countDailySummary(
             LocalDate fromDate,
             LocalDate toDate) {
@@ -50,50 +36,6 @@ public class BcDs01Service {
         return repository.countDailySummary(
                 fromDate,
                 toDate
-        );
-    }
-
-    // =========================
-    // BẢNG 1C - CHI TIẾT THUÊ BAO
-    // =========================
-
-    public List<Map<String, Object>> getSubscriberDetails(
-            LocalDate fromDate,
-            LocalDate toDate,
-            String msisdn,
-            String kitStatus,
-            String reconciliationStatus,
-            String tinhTrangGoiMoi,
-            int pageSize,
-            int offset) {
-
-        return repository.getSubscriberDetails(
-                fromDate,
-                toDate,
-                msisdn,
-                kitStatus,
-                reconciliationStatus,
-                tinhTrangGoiMoi,
-                pageSize,
-                offset
-        );
-    }
-
-    public int countSubscriberDetails(
-            LocalDate fromDate,
-            LocalDate toDate,
-            String msisdn,
-            String kitStatus,
-            String reconciliationStatus,
-            String tinhTrangGoiMoi) {
-
-        return repository.countSubscriberDetails(
-                fromDate,
-                toDate,
-                msisdn,
-                kitStatus,
-                reconciliationStatus,
-                tinhTrangGoiMoi
         );
     }
 

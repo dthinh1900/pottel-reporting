@@ -3,7 +3,7 @@ import { useState } from 'react'
 import './Login.css'
 import { login } from '../services/api'
 
-function Login({ onLoginSuccess }) {
+function Login({ onLoginSuccess, message }) {
   const [tenDangNhap, setTenDangNhap] = useState('admin')
   const [matKhau, setMatKhau] = useState('')
   const [loading, setLoading] = useState(false)
@@ -47,6 +47,12 @@ function Login({ onLoginSuccess }) {
             Đăng nhập để tiếp tục sử dụng hệ thống báo cáo Pottel.
           </p>
         </div>
+
+        {message && !error && (
+          <div className="login-success" role="status">
+            <span>{message}</span>
+          </div>
+        )}
 
         {error && (
           <div className="login-error" role="alert">

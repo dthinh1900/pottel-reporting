@@ -1,10 +1,12 @@
 import Sidebar from './Sidebar'
 import Header from './Header'
+import Footer from './Footer'
 import './MainLayout.css'
 
 function MainLayout({
-  currentPage,
+  currentPath,
   currentUser,
+  isAdmin,
   onNavigate,
   onLogout,
   children,
@@ -12,19 +14,23 @@ function MainLayout({
   return (
     <div className="main-layout">
       <Sidebar
-        currentPage={currentPage}
+        currentPath={currentPath}
+        isAdmin={isAdmin}
         onNavigate={onNavigate}
       />
 
       <div className="main-content">
         <Header
           currentUser={currentUser}
+          isAdmin={isAdmin}
           onLogout={onLogout}
         />
 
         <main className="page-content">
           {children}
         </main>
+
+        <Footer />
       </div>
     </div>
   )
