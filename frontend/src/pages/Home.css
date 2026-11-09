@@ -1,8 +1,9 @@
-/* Style riêng của trang chủ (danh mục báo cáo) */
 
 /* ========================================
    HOMEPAGE - REPORT CATALOG
 ======================================== */
+
+/* PHẦN GIỚI THIỆU */
 
 .home-heading {
   display: flex;
@@ -55,12 +56,17 @@
 .home-status-dot {
   width: 8px;
   height: 8px;
+  flex-shrink: 0;
   border-radius: 50%;
   background: #16A36A;
 }
 
+/* DANH MỤC BÁO CÁO */
+
 .home-section {
+  width: 100%;
   padding: 0 4px;
+  box-sizing: border-box;
 }
 
 .home-section-heading {
@@ -94,23 +100,46 @@
   white-space: nowrap;
 }
 
+/* ========================================
+   LƯỚI THẺ BÁO CÁO
+======================================== */
+
 .report-catalog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 340px));
-  gap: 18px;
+
+  /* Tự động chia cột và giãn đều chiều rộng */
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, 340px), 1fr)
+  );
+
+  gap: 20px;
+  align-items: stretch;
+  width: 100%;
 }
+
+/* THẺ BÁO CÁO */
 
 .report-catalog-card {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  min-width: 0;
   min-height: 225px;
+  height: 100%;
+  box-sizing: border-box;
+
   padding: 20px;
   background: #fff;
   border: 1px solid var(--border-color);
   border-radius: 11px;
   color: var(--text-primary);
   text-align: left;
-  transition: transform 0.2s ease, box-shadow 0.2s ease,
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
     border-color 0.2s ease;
 }
 
@@ -120,10 +149,13 @@
   box-shadow: 0 10px 25px rgba(16, 29, 58, 0.09);
 }
 
+/* ĐẦU THẺ */
+
 .catalog-card-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
 
 .catalog-report-code {
@@ -141,11 +173,14 @@
   place-items: center;
   width: 38px;
   height: 38px;
+  flex-shrink: 0;
   background: #FFF5CC;
   border-radius: 9px;
   color: #9A7100;
   font-size: 20px;
 }
+
+/* NỘI DUNG THẺ */
 
 .catalog-card-body {
   flex: 1;
@@ -166,10 +201,15 @@
   line-height: 1.7;
 }
 
+/* CHÂN THẺ */
+
 .catalog-card-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  margin-top: auto;
   padding-top: 14px;
   border-top: 1px solid #EDF0F4;
   color: var(--pottel-navy);
@@ -178,6 +218,7 @@
 }
 
 .catalog-arrow {
+  flex-shrink: 0;
   color: #B78300;
   font-size: 20px;
   transition: transform 0.2s ease;
@@ -187,8 +228,9 @@
   transform: translateX(5px);
 }
 
-
-/* Thẻ báo cáo chưa triển khai */
+/* ========================================
+   THẺ CHƯA TRIỂN KHAI
+======================================== */
 
 .report-catalog-card.is-disabled {
   background: #F8FAFC;
@@ -210,8 +252,46 @@
   color: var(--text-secondary);
 }
 
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 768px) {
+  .report-catalog-grid {
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, 280px), 1fr)
+    );
+    gap: 14px;
+  }
+
+  .home-heading {
+    padding: 24px;
+  }
+}
+
 @media (max-width: 600px) {
-  .home-heading { align-items: flex-start; flex-direction: column; padding: 22px; }
-  .home-heading h1 { font-size: 25px; }
-  .report-catalog-grid { grid-template-columns: 1fr; }
+  .home-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 22px;
+    margin-bottom: 28px;
+  }
+
+  .home-heading h1 {
+    font-size: 25px;
+  }
+
+  .report-catalog-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .home-section-heading {
+    align-items: flex-start;
+  }
+
+  .report-catalog-card {
+    min-height: 210px;
+  }
 }
