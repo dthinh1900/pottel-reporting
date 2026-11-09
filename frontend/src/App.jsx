@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Bc01Page from './pages/reports/Bc01/Bc01Page'
 import AccountsPage from './pages/admin/AccountsPage'
 import MainLayout from './components/layout/MainLayout'
+import Bc01DetailPage from './pages/reports/Bc01/Bc01DetailPage'
 
 import {
   AUTH_EXPIRED_EVENT,
@@ -18,6 +19,7 @@ import { navigate, useRoute } from './router'
 const KNOWN_PATHS = [
   '/',
   '/reports/bc-ds-01',
+  '/reports/bc-ds-01-detail',
   '/admin/accounts',
 ]
 
@@ -151,10 +153,13 @@ function App() {
   const isAdmin = hasAdminRole(currentUser)
 
   // Chọn trang theo đường dẫn
+  // Chọn trang theo đường dẫn
   let page
 
   if (route.path === '/reports/bc-ds-01') {
     page = <Bc01Page />
+  } else if (route.path === '/reports/bc-ds-01-detail') {
+    page = <Bc01DetailPage />
   } else if (route.path === '/admin/accounts') {
     page = isAdmin ? (
       <AccountsPage
