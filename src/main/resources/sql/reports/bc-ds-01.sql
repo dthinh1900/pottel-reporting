@@ -103,14 +103,6 @@ goi_moi AS (
     WHERE NULLIF(BTRIM(msisdn), '') IS NOT NULL
       AND insert_time IS NOT NULL
       AND TRIM(insert_time) <> ''
-      AND (
-          CAST(? AS DATE) IS NULL
-          OR TO_DATE(TRIM(insert_time), 'DD-MON-YY') >= CAST(? AS DATE)
-      )
-      AND (
-          CAST(? AS DATE) IS NULL
-          OR TO_DATE(TRIM(insert_time), 'DD-MON-YY') <= CAST(? AS DATE)
-      )
     GROUP BY NULLIF(BTRIM(msisdn), '')
 ),
 details AS (
@@ -136,8 +128,18 @@ filtered AS (
     SELECT *
     FROM details
     WHERE
-        -- 1. Lọc MSISDN
+        -- 0. Lọc theo ngày đăng ký KIT
         (
+            CAST(? AS DATE) IS NULL
+            OR registed_date::date >= CAST(? AS DATE)
+        )
+        AND (
+            CAST(? AS DATE) IS NULL
+            OR registed_date::date <= CAST(? AS DATE)
+        )
+
+        -- 1. Lọc MSISDN
+        AND (
             CAST(? AS TEXT) IS NULL
             OR msisdn LIKE CAST(? AS TEXT)
         )
@@ -159,7 +161,7 @@ filtered AS (
             OR reconciliation_status = CAST(? AS TEXT)
         )
 
-        -- 4. Lọc tình trạng GOI_MOI trong khoảng ngày
+        -- 4. Lọc tình trạng GOI_MOI
         AND (
             CAST(? AS TEXT) IS NULL
             OR (
@@ -175,7 +177,7 @@ filtered AS (
 )
 SELECT *
 FROM filtered
-ORDER BY last_event_date ASC NULLS LAST, msisdn ASC
+ORDER BY registed_date ASC NULLS LAST, msisdn ASC
 LIMIT ? OFFSET ?;
 
 
@@ -206,14 +208,6 @@ goi_moi AS (
     WHERE NULLIF(BTRIM(msisdn), '') IS NOT NULL
       AND insert_time IS NOT NULL
       AND TRIM(insert_time) <> ''
-      AND (
-          CAST(? AS DATE) IS NULL
-          OR TO_DATE(TRIM(insert_time), 'DD-MON-YY') >= CAST(? AS DATE)
-      )
-      AND (
-          CAST(? AS DATE) IS NULL
-          OR TO_DATE(TRIM(insert_time), 'DD-MON-YY') <= CAST(? AS DATE)
-      )
     GROUP BY NULLIF(BTRIM(msisdn), '')
 ),
 details AS (
@@ -239,8 +233,18 @@ filtered AS (
     SELECT *
     FROM details
     WHERE
-        -- 1. Lọc MSISDN
+        -- 0. Lọc theo ngày đăng ký KIT
         (
+            CAST(? AS DATE) IS NULL
+            OR registed_date::date >= CAST(? AS DATE)
+        )
+        AND (
+            CAST(? AS DATE) IS NULL
+            OR registed_date::date <= CAST(? AS DATE)
+        )
+
+        -- 1. Lọc MSISDN
+        AND (
             CAST(? AS TEXT) IS NULL
             OR msisdn LIKE CAST(? AS TEXT)
         )
@@ -262,7 +266,7 @@ filtered AS (
             OR reconciliation_status = CAST(? AS TEXT)
         )
 
-        -- 4. Lọc tình trạng GOI_MOI trong khoảng ngày
+        -- 4. Lọc tình trạng GOI_MOI
         AND (
             CAST(? AS TEXT) IS NULL
             OR (

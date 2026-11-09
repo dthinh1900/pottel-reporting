@@ -63,7 +63,7 @@ function ReportFilters({
 
         <div className="filter-fields">
           <label>
-            Từ ngày GOI_MOI
+            Từ ngày đăng ký
             <input
               type="date"
               value={draft.fromDate}
@@ -74,7 +74,7 @@ function ReportFilters({
           </label>
 
           <label>
-            Đến ngày GOI_MOI
+            Đến ngày đăng ký
             <input
               type="date"
               value={draft.toDate}

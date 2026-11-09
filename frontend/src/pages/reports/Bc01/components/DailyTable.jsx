@@ -8,7 +8,7 @@ function DailyTable({ rows, loading, pagination }) {
   return (
     <section className="table-panel">
       <div className="table-title">
-        <strong>Bảng 1B - Tổng hợp GOI_MOI theo ngày</strong>
+        <strong>Tổng hợp GOI_MOI theo ngày</strong>
         <p>Số liệu được tổng hợp theo ngày ghi nhận GOI_MOI trên CDR.</p>
       </div>
 

@@ -172,7 +172,7 @@ function Bc01Page() {
       </div>
 
       <section className="overview">
-        <h2>Tổng quan dữ liệu (1A)</h2>
+        <h2>Tổng quan dữ liệu</h2>
         <p>Các chỉ số tổng hợp từ dữ liệu nguồn</p>
 
         {meta ? (
@@ -187,7 +187,7 @@ function Bc01Page() {
       </section>
 
       <section className="report-section">
-        <h2>Bảng 1B – Tổng hợp GOI_MOI theo ngày</h2>
+        <h2>Tổng hợp GOI_MOI theo ngày</h2>
         <p>Thống kê sự kiện theo từng ngày</p>
 
         <ReportFilters

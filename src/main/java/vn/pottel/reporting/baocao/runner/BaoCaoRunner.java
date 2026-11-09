@@ -159,7 +159,7 @@ public class BaoCaoRunner {
         // 13 tham số lọc dùng chung cho bảng 1C và 1D.
         Object[] thamSoLoc = new Object[]{
 
-                // 1-4: Lọc ngày GOI_MOI.
+                // 1-4: Lọc theo ngày đăng ký KIT (registed_date).
                 tuNgay, tuNgay, denNgay, denNgay,
 
                 // 5-6: Lọc MSISDN.

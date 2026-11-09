@@ -174,7 +174,7 @@ function Bc01DetailPage() {
       </div>
 
       <section className="report-section">
-        <h2>Bảng 1C – Chi tiết thuê bao</h2>
+        <h2>Chi tiết thuê bao</h2>
         <p>Tra cứu và đối soát thông tin từng thuê bao</p>
 
         <ReportFilters
