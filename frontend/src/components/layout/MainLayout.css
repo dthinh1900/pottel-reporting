@@ -1,3 +1,4 @@
+
 /* ================================
    POTTEL REPORTING - MAIN LAYOUT
 ================================ */
@@ -19,15 +20,23 @@
 .sidebar {
   display: flex;
   flex-direction: column;
-  width: 250px;
-  min-width: 250px;
+  width: 290px;
+  min-width: 290px;
   height: 100vh;
   overflow: hidden;
   background: var(--pottel-navy);
   color: var(--pottel-white);
+  transition: width 0.25s ease, min-width 0.25s ease;
 }
 
-/* Logo */
+/* SIDEBAR THU GỌN */
+
+.sidebar.collapsed {
+  width: 76px;
+  min-width: 76px;
+}
+
+/* LOGO */
 
 .sidebar-brand {
   display: flex;
@@ -51,9 +60,23 @@
   border-radius: 8px;
   transform: scale(1.15);
   transform-origin: center;
+  transition: opacity 0.2s ease;
 }
 
-/* Menu */
+/* Ẩn logo khi thu gọn */
+
+.sidebar.collapsed .sidebar-brand {
+  height: 70px;
+  padding: 5px;
+}
+
+.sidebar.collapsed .sidebar-brand-image {
+  display: none;
+}
+
+/* ================================
+   MENU
+================================ */
 
 .sidebar-menu {
   flex: 1;
@@ -71,6 +94,8 @@
   letter-spacing: 1px;
 }
 
+/* CÁC MỤC ĐIỀU HƯỚNG CHÍNH */
+
 .sidebar-item {
   display: flex;
   align-items: center;
@@ -83,6 +108,7 @@
   background: transparent;
   color: #e2e8f0;
   text-align: left;
+  cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
@@ -97,15 +123,195 @@
   font-weight: 700;
 }
 
+/* ICON TRANG CHỦ VÀ QUẢN LÝ TÀI KHOẢN */
+
 .sidebar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 20px;
+  min-width: 20px;
   flex-shrink: 0;
   color: inherit;
   font-size: 18px;
   text-align: center;
 }
 
-/* Chân sidebar */
+/* ================================
+   NHÓM BÁO CÁO
+================================ */
+
+.sidebar-report-group {
+  margin-bottom: 8px;
+}
+
+.sidebar-group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 13px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-group-toggle:hover,
+.sidebar-group-toggle.has-active {
+  background: rgba(255, 196, 0, 0.12);
+  color: var(--pottel-yellow);
+}
+
+/* ICON NHÓM BÁO CÁO */
+
+.sidebar-group-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  min-width: 20px;
+  flex-shrink: 0;
+  color: inherit;
+  font-size: 18px;
+}
+
+/* TÊN NHÓM */
+
+.sidebar-group-label {
+  flex: 1;
+  margin-left: 12px;
+  white-space: nowrap;
+}
+
+/* MŨI TÊN MỞ RỘNG */
+
+.sidebar-group-arrow {
+  display: inline-block;
+  flex-shrink: 0;
+  font-size: 22px;
+  line-height: 1;
+  transform: rotate(0deg);
+  transition: transform 0.2s ease;
+}
+
+.sidebar-group-arrow.open {
+  transform: rotate(90deg);
+}
+
+/* DANH SÁCH BÁO CÁO CON */
+
+.sidebar-group-items {
+  padding: 3px 0 4px 10px;
+}
+
+.sidebar-subitem {
+  gap: 0;
+  padding-left: 12px;
+  font-size: 13px;
+}
+
+.sidebar-subitem .sidebar-item-label {
+  display: block;
+  margin-left: 0;
+  white-space: normal;
+}
+
+/* ================================
+   SIDEBAR THU GỌN
+================================ */
+
+/* Thu hẹp khoảng trống menu */
+
+.sidebar.collapsed .sidebar-menu {
+  padding: 12px 7px;
+}
+
+/* Ẩn tiêu đề khu vực */
+
+.sidebar.collapsed .sidebar-heading {
+  display: none;
+}
+
+/* Các mục điều hướng chính thành ô icon */
+
+.sidebar.collapsed .sidebar-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  min-height: 44px;
+  margin: 0 auto 7px;
+  padding: 7px 0;
+  gap: 0;
+  border-radius: 9px;
+}
+
+/* Icon Trang chủ và Quản lý tài khoản */
+
+.sidebar.collapsed .sidebar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-size: 21px;
+}
+
+/* Thu gọn nhóm báo cáo */
+
+.sidebar.collapsed .sidebar-report-group {
+  margin-bottom: 7px;
+}
+
+.sidebar.collapsed .sidebar-group-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 44px;
+  margin: 0 auto;
+  padding: 7px 0;
+  border-radius: 9px;
+}
+
+/* Icon nhóm báo cáo */
+
+.sidebar.collapsed .sidebar-group-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-size: 21px;
+}
+
+/* Ẩn tên nhóm, tên mục và mũi tên */
+
+.sidebar.collapsed .sidebar-group-label,
+.sidebar.collapsed .sidebar-item-label,
+.sidebar.collapsed .sidebar-group-arrow {
+  display: none;
+}
+
+/* Ẩn toàn bộ báo cáo con khi thu gọn */
+
+.sidebar.collapsed .sidebar-group-items {
+  display: none;
+}
+
+/* Ẩn chân Sidebar */
+
+.sidebar.collapsed .sidebar-footer {
+  display: none;
+}
+
+/* ================================
+   SIDEBAR FOOTER
+================================ */
 
 .sidebar-footer {
   flex-shrink: 0;
@@ -137,7 +343,7 @@
   background: var(--pottel-bg);
 }
 
-/* Header */
+/* HEADER */
 
 .main-header {
   display: flex;
@@ -150,7 +356,7 @@
   background: var(--pottel-white);
 }
 
-/* Thương hiệu */
+/* THƯƠNG HIỆU */
 
 .header-brand {
   display: flex;
@@ -178,7 +384,7 @@
   letter-spacing: 0.3px;
 }
 
-/* Tài khoản */
+/* TÀI KHOẢN */
 
 .header-user {
   display: flex;
@@ -210,6 +416,7 @@
   border-radius: 7px;
   background: var(--pottel-white);
   color: var(--pottel-navy);
+  cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
 }
 
@@ -218,7 +425,7 @@
   border-color: var(--pottel-yellow);
 }
 
-/* Nội dung cuộn độc lập */
+/* NỘI DUNG CUỘN ĐỘC LẬP */
 
 .page-content {
   flex: 1;
@@ -234,8 +441,13 @@
 
 @media (max-width: 768px) {
   .sidebar {
-    width: 190px;
-    min-width: 190px;
+    width: 240px;
+    min-width: 240px;
+  }
+
+  .sidebar.collapsed {
+    width: 68px;
+    min-width: 68px;
   }
 
   .main-header {
@@ -261,8 +473,13 @@
 
 @media (max-width: 480px) {
   .sidebar {
-    width: 150px;
-    min-width: 150px;
+    width: 190px;
+    min-width: 190px;
+  }
+
+  .sidebar.collapsed {
+    width: 60px;
+    min-width: 60px;
   }
 
   .sidebar-item {

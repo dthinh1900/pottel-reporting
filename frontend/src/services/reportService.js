@@ -43,3 +43,30 @@ export function fetchBcDs01(query, signal) {
 
   return apiFetch(`/reports/bc-ds-01?${params.toString()}`, { signal })
 }
+
+// Gọi API báo cáo BC-DT-01.
+// Lấy dữ liệu tổng hợp doanh thu theo ngày.
+export function fetchBcDt01(query, signal) {
+  const { fromDate, toDate } = query
+
+  const params = new URLSearchParams({
+    fromDate,
+    toDate,
+  })
+
+  return apiFetch(
+    `/reports/bc-dt-01?${params.toString()}`,
+    { signal }
+  )
+}
+
+// Gọi API báo cáo BC-DT-02.
+// Lấy chi tiết doanh thu của từng thuê bao trong một ngày.
+export function fetchBcDt02(date, signal) {
+  const params = new URLSearchParams({ date })
+
+  return apiFetch(
+    `/reports/bc-dt-02?${params.toString()}`,
+    { signal }
+  )
+}

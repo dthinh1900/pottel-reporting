@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import './Bc01.css'
+import '../Bc01/Bc01.css'
 import Alert from '../../../components/common/Alert'
 import { fetchBcDs01 } from '../../../services/reportService'
 import { PAGE_SIZE_OPTIONS } from '../../../components/common/Pagination'
 import { replaceUrl } from '../../../router'
 import { validateDateRange } from '../../../utils/format'
-import ReportFilters, { EMPTY_FILTERS } from './components/ReportFilters'
-import SubscriberTable from './components/SubscriberTable'
+import ReportFilters, { EMPTY_FILTERS } from '../Bc01/components/ReportFilters'
+import SubscriberTable from '../Bc01/components/SubscriberTable'
 
-const REPORT_PATH = '/reports/bc-ds-01-detail'
+const REPORT_PATH = '/reports/bc-ds-02'
 const DEFAULT_PAGE_SIZE = 20
 
 function readStateFromUrl() {
@@ -160,7 +160,7 @@ function Bc01DetailPage() {
     <main className="main-container">
       <div className="report-heading">
         <span className="report-label">
-          REPORT / BC-DS-01-DETAIL
+          REPORT / BC-DS-02
         </span>
         <h1>Chi tiết thuê bao</h1>
         <p>

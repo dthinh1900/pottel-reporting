@@ -1,3 +1,5 @@
+
+import { useState } from 'react'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import Footer from './Footer'
@@ -11,12 +13,16 @@ function MainLayout({
   onLogout,
   children,
 }) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+
   return (
-    <div className="main-layout">
+    <div className={`main-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <Sidebar
         currentPath={currentPath}
         isAdmin={isAdmin}
         onNavigate={onNavigate}
+        collapsed={sidebarCollapsed}
+        onToggle={() => setSidebarCollapsed(current => !current)}
       />
 
       <div className="main-content">

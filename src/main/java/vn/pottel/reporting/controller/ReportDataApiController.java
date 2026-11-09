@@ -235,4 +235,99 @@ public class ReportDataApiController {
     private ResponseStatusException badRequest(String message) {
         return new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
     }
+
+    
+    // ==========================================
+    // API BC-DT-01: DOANH THU THEO NGÀY
+    // ==========================================
+
+    @GetMapping("/bc-dt-01")
+    public Map<String, Object> layBaoCaoDoanhThu(
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate fromDate,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate toDate
+    ) {
+        if (fromDate.isAfter(toDate)) {
+            throw badRequest(
+                    "Ngày bắt đầu không được lớn hơn ngày kết thúc."
+            );
+        }
+
+        LocalDate homNay = LocalDate.now(VN_ZONE);
+
+        if (fromDate.isAfter(homNay) || toDate.isAfter(homNay)) {
+            throw badRequest(
+                    "Ngày lọc không được vượt quá ngày hiện tại."
+            );
+        }
+
+        KetQuaBaoCao ketQua = runner.chayBcDt01(
+                fromDate,
+                toDate
+        );
+
+        BangKetQua bang = ketQua.layBang("1A");
+
+        if (bang == null) {
+            throw new IllegalStateException(
+                    "Không tìm thấy bảng kết quả doanh thu 1A."
+            );
+        }
+
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        response.put("selectedBc", "BC-DT-01");
+        response.put("fromDate", fromDate);
+        response.put("toDate", toDate);
+        response.put("dailyRevenue", bang.dong());
+        response.put("totalRows", bang.dong().size());
+
+        return response;
+    }
+
+
+    // ==========================================
+    // BC-DT-02 - CHI TIẾT DOANH THU THEO THUÊ BAO
+    // ==========================================
+
+    @GetMapping("/bc-dt-02")
+    public Map<String, Object> layChiTietDoanhThu(
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate date
+    ) {
+        if (date == null) {
+            throw badRequest("Ngày xem báo cáo không được để trống.");
+        }
+
+        LocalDate homNay = LocalDate.now(VN_ZONE);
+
+        if (date.isAfter(homNay)) {
+            throw badRequest("Ngày xem báo cáo không được vượt quá ngày hiện tại.");
+        }
+
+        KetQuaBaoCao ketQua = runner.chayBcDt02(date);
+
+        BangKetQua bang = ketQua.layBang("1A");
+
+        if (bang == null) {
+            throw new IllegalStateException(
+                    "Không tìm thấy bảng kết quả chi tiết doanh thu 1A."
+            );
+        }
+
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        response.put("selectedBc", "BC-DT-02");
+        response.put("date", date);
+        response.put("subscriberDetails", bang.dong());
+        response.put("totalRows", bang.dong().size());
+
+        return response;
+    }
+
 }

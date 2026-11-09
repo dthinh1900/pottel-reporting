@@ -21,6 +21,20 @@ public class DanhMucBaoCao {
                 "reports/bc-ds-01.sql",
                 true
         ));
+        dangKy(new DinhNghiaBaoCao(
+                "BC-DT-01",
+                "Tổng hợp doanh thu theo ngày",
+                "Báo cáo số lượng thuê bao, doanh thu chưa VAT, tiền VAT và tổng doanh thu theo ngày",
+                "reports/bc-dt-01.sql",
+                true
+        ));
+        dangKy(new DinhNghiaBaoCao(
+                "BC-DT-02",
+                "Chi tiết doanh thu theo thuê bao",
+                "Chi tiết doanh thu phân bổ của từng thuê bao theo ngày",
+                "reports/bc-dt-02.sql",
+                true
+        ));
     }
 
     private void dangKy(DinhNghiaBaoCao baoCao) {

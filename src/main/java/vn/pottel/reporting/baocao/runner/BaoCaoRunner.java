@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.Arrays;
 import java.sql.Date;
 import java.util.LinkedHashMap;
+import java.time.LocalDate;
 
 import org.springframework.stereotype.Component;
 
@@ -263,22 +264,69 @@ public class BaoCaoRunner {
         );
     }
 
-    // Chạy toàn bộ các bảng báo cáo BC-DS-01
-public KetQuaBaoCao chayBcDs01(ThamSoBaoCao thamSo) {
-    return chayBcDs01(
-            thamSo,
-            Set.of("1A", "1B", "1C", "1D")
-    );
-}
-    // =========================
-    // DANH SÁCH TRẠNG THÁI BỘ LỌC
-    // =========================
+        // Chạy toàn bộ các bảng báo cáo BC-DS-01
+        public KetQuaBaoCao chayBcDs01(ThamSoBaoCao thamSo) {
+        return chayBcDs01(
+                thamSo,
+                Set.of("1A", "1B", "1C", "1D")
+        );
+        }
+        // =========================
+        // DANH SÁCH TRẠNG THÁI BỘ LỌC
+        // =========================
 
-    public List<String> layDanhSachTrangThaiKit() {
-        return bcDs01Service.getKitStatuses();
-    }
+        public List<String> layDanhSachTrangThaiKit() {
+                return bcDs01Service.getKitStatuses();
+        }
 
-    public List<String> layDanhSachTrangThaiDoiSoat() {
-        return bcDs01Service.getReconciliationStatuses();
-    }
+        public List<String> layDanhSachTrangThaiDoiSoat() {
+                return bcDs01Service.getReconciliationStatuses();
+        }
+
+        
+        // =========================
+        // BC-DT-01 - DOANH THU THEO NGÀY
+        // =========================
+
+        public KetQuaBaoCao chayBcDt01(
+                LocalDate tuNgay,
+                LocalDate denNgay
+        ) {
+                if (tuNgay == null || denNgay == null) {
+                throw new IllegalArgumentException(
+                        "Ngày bắt đầu và ngày kết thúc không được để trống."
+                );
+                }
+
+                Map<String, Object[]> thamSoTheoBang =
+                        new LinkedHashMap<>();
+
+                thamSoTheoBang.put("1A", new Object[]{
+                        tuNgay.toString(),
+                        denNgay.toString()
+                });
+
+                return chay("BC-DT-01", thamSoTheoBang);
+        }
+        // =========================
+        // BC-DT-02 - CHI TIẾT DOANH THU
+        // =========================
+
+        public KetQuaBaoCao chayBcDt02(LocalDate ngay) {
+
+        if (ngay == null) {
+                throw new IllegalArgumentException(
+                        "Ngày xem báo cáo không được để trống."
+                );
+        }
+
+        Map<String, Object[]> thamSoTheoBang = new LinkedHashMap<>();
+
+        thamSoTheoBang.put("1A", new Object[]{
+                ngay.toString()
+        });
+
+        return chay("BC-DT-02", thamSoTheoBang);
+        }
+
 }
