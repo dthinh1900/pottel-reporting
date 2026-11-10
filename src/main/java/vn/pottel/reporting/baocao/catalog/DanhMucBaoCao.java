@@ -1,4 +1,3 @@
-
 package vn.pottel.reporting.baocao.catalog;
 
 import java.util.LinkedHashMap;
@@ -14,6 +13,8 @@ public class DanhMucBaoCao {
             new LinkedHashMap<>();
 
     public DanhMucBaoCao() {
+
+        // BC-DS-01: Báo cáo đối soát KIT và GOI_MOI
         dangKy(new DinhNghiaBaoCao(
                 "BC-DS-01",
                 "Báo cáo đối soát KIT và GOI_MOI",
@@ -21,6 +22,17 @@ public class DanhMucBaoCao {
                 "reports/bc-ds-01.sql",
                 true
         ));
+
+        // BC-DS-02: Báo cáo đối soát KIT và GOI_MOI (phần 2)
+        dangKy(new DinhNghiaBaoCao(
+                "BC-DS-02",
+                "Báo cáo đối soát KIT và GOI_MOI - Phần 2",
+                "Báo cáo gồm bảng 1C và bảng đếm dữ liệu phục vụ phân trang",
+                "reports/bc-ds-02.sql",
+                true
+        ));
+
+        // BC-DT-01: Tổng hợp doanh thu theo ngày
         dangKy(new DinhNghiaBaoCao(
                 "BC-DT-01",
                 "Tổng hợp doanh thu theo ngày",
@@ -28,6 +40,8 @@ public class DanhMucBaoCao {
                 "reports/bc-dt-01.sql",
                 true
         ));
+
+        // BC-DT-02: Chi tiết doanh thu theo thuê bao
         dangKy(new DinhNghiaBaoCao(
                 "BC-DT-02",
                 "Chi tiết doanh thu theo thuê bao",

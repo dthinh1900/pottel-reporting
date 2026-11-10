@@ -1,12 +1,14 @@
+
 import { useEffect, useRef, useState } from 'react'
 import '../Bc01/Bc01.css'
 import Alert from '../../../components/common/Alert'
-import { fetchBcDs01 } from '../../../services/reportService'
+import { fetchBcDs02 } from '../../../services/reportService'
 import { PAGE_SIZE_OPTIONS } from '../../../components/common/Pagination'
 import { replaceUrl } from '../../../router'
 import { validateDateRange } from '../../../utils/format'
 import ReportFilters, { EMPTY_FILTERS } from '../Bc01/components/ReportFilters'
 import SubscriberTable from '../Bc01/components/SubscriberTable'
+import Pagination from '../../../components/common/Pagination'
 
 const REPORT_PATH = '/reports/bc-ds-02'
 const DEFAULT_PAGE_SIZE = 20
@@ -66,7 +68,7 @@ function Bc01DetailPage() {
     replaceUrl(buildUrl({ page, pageSize, filters }))
   }, [page, pageSize, filters])
 
-  // Tải riêng dữ liệu bảng 1C.
+  // Tải dữ liệu bảng 1C từ API BC-DS-02.
   useEffect(() => {
     const controller = new AbortController()
 
@@ -86,7 +88,7 @@ function Bc01DetailPage() {
       setError('')
 
       try {
-        const result = await fetchBcDs01(
+        const result = await fetchBcDs02(
           {
             bc: '1C',
             ...filters,
@@ -189,11 +191,12 @@ function Bc01DetailPage() {
           onReset={handleResetFilters}
         />
 
+        <Pagination loading={loading} {...pagination} />
+
         <SubscriberTable
           rows={rows1C}
           rowOffset={rowOffset}
           loading={loading}
-          pagination={pagination}
         />
       </section>
 
@@ -203,7 +206,10 @@ function Bc01DetailPage() {
           actions={
             <>
               {page > 1 && (
-                <button type="button" onClick={() => setPage(1)}>
+                <button
+                  type="button"
+                  onClick={() => setPage(1)}
+                >
                   Về trang đầu
                 </button>
               )}

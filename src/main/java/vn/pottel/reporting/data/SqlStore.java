@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,7 +14,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Collections;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -109,15 +109,6 @@ public class SqlStore {
 
     /**
      * Tách một file SQL thành nhiều truy vấn theo mã @table.
-     *
-     * Ví dụ:
-     * -- @table 1A
-     * SELECT ...
-     *
-     * -- @table 1B
-     * SELECT ...
-     *
-     * Kết quả: Map gồm 1A và 1B.
      */
     public Map<String, String> tachCacBang(String noiDungSql) {
 
@@ -136,8 +127,6 @@ public class SqlStore {
 
         while (matcher.find()) {
 
-            // Kiểm tra phần trước marker đầu tiên.
-            // Chỉ cho phép chú thích SQL, không cho phép câu lệnh SQL.
             if (viTriBatDau == -1) {
                 String phanTruoc = noiDungSql
                         .substring(0, matcher.start())
@@ -151,9 +140,12 @@ public class SqlStore {
                 }
 
             } else {
-                String sqlBang = noiDungSql
-                        .substring(viTriBatDau, matcher.start())
-                        .trim();
+                String sqlBang = lamSachTruyVan(
+                        noiDungSql.substring(
+                                viTriBatDau,
+                                matcher.start()
+                        )
+                );
 
                 if (sqlBang.isEmpty()) {
                     throw new IllegalArgumentException(
@@ -179,10 +171,9 @@ public class SqlStore {
             );
         }
 
-        // Lấy truy vấn cuối cùng.
-        String sqlCuoi = noiDungSql
-                .substring(viTriBatDau)
-                .trim();
+        String sqlCuoi = lamSachTruyVan(
+                noiDungSql.substring(viTriBatDau)
+        );
 
         if (sqlCuoi.isEmpty()) {
             throw new IllegalArgumentException(
@@ -197,12 +188,35 @@ public class SqlStore {
             );
         }
 
-        // Trả về Map không thể chỉnh sửa nhưng vẫn giữ thứ tự bảng.
         return Collections.unmodifiableMap(
                 new LinkedHashMap<>(cacBang)
         );
     }
 
+    /**
+     * Làm sạch phần cuối truy vấn:
+     * - Bỏ các dòng chú thích nằm cuối.
+     * - Bỏ dấu chấm phẩy kết thúc.
+     */
+    private String lamSachTruyVan(String sql) {
+
+        if (sql == null) {
+            return "";
+        }
+
+        sql = sql.trim();
+
+        // Loại bỏ các dòng chú thích cuối truy vấn.
+        sql = sql.replaceAll(
+                "(?m)(?:\\R\\s*--[^\\r\\n]*)+\\s*$",
+                ""
+        ).trim();
+
+        // Loại bỏ dấu chấm phẩy cuối truy vấn.
+        sql = sql.replaceAll(";\\s*$", "").trim();
+
+        return sql;
+    }
 
     /**
      * Kiểm tra phần nội dung có chỉ gồm chú thích SQL hay không.

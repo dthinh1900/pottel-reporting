@@ -14,6 +14,7 @@ import java.util.Map;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Component
 public class QueryRunner {
@@ -21,9 +22,12 @@ public class QueryRunner {
     private static final int QUERY_TIMEOUT_SECONDS = 30;
 
     private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public QueryRunner(JdbcTemplate jdbcTemplate) {
+    public QueryRunner(JdbcTemplate jdbcTemplate,
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
     /**
@@ -178,6 +182,109 @@ public BangKetQua chayBangKetQua(String sql, Object... thamSo) {
                     );
                 }
             }
+    );
+}
+/**
+ * Thực thi SELECT bằng tham số có tên.
+ * Giữ lại tên cột kể cả khi không có dòng dữ liệu.
+ */
+/**
+ * Thực thi SELECT bằng tham số có tên.
+ * Giữ lại tên cột kể cả khi không có dòng dữ liệu.
+ */
+@Transactional(readOnly = true, timeout = 30)
+public BangKetQua chayBangKetQuaTheoTen(
+        String sql,
+        Map<String, ?> thamSo
+) {
+    kiemTraSql(sql);
+
+    if (thamSo == null) {
+        thamSo = Collections.emptyMap();
+    }
+
+    return namedParameterJdbcTemplate.query(
+            sql,
+            thamSo,
+            resultSet -> {
+                ResultSetMetaData metadata = resultSet.getMetaData();
+                int soCot = metadata.getColumnCount();
+
+                List<String> danhSachCot = new ArrayList<>();
+
+                for (int i = 1; i <= soCot; i++) {
+                    danhSachCot.add(metadata.getColumnLabel(i));
+                }
+
+                List<Map<String, Object>> danhSachDong =
+                        new ArrayList<>();
+
+                while (resultSet.next()) {
+                    Map<String, Object> dong = new LinkedHashMap<>();
+
+                    for (int i = 1; i <= soCot; i++) {
+                        dong.put(
+                                danhSachCot.get(i - 1),
+                                resultSet.getObject(i)
+                        );
+                    }
+
+                    danhSachDong.add(dong);
+                }
+
+                return new BangKetQua(danhSachCot, danhSachDong);
+            }
+    );
+}
+
+/**
+ * Chạy nhiều câu SELECT bằng tham số có tên.
+ *
+ * cacTruyVan:
+ * Mã bảng -> câu SQL.
+ *
+ * thamSoTheoBang:
+ * Mã bảng -> các tham số có tên riêng của bảng đó.
+ */
+@Transactional(readOnly = true, timeout = 30)
+public Map<String, BangKetQua> chayNhieuBangTheoTen(
+        Map<String, String> cacTruyVan,
+        Map<String, Map<String, Object>> thamSoTheoBang
+) {
+    if (cacTruyVan == null || cacTruyVan.isEmpty()) {
+        throw new IllegalArgumentException(
+                "Danh sách câu SQL không được để trống."
+        );
+    }
+
+    if (thamSoTheoBang == null) {
+        thamSoTheoBang = Collections.emptyMap();
+    }
+
+    for (String maBang : thamSoTheoBang.keySet()) {
+        if (!cacTruyVan.containsKey(maBang)) {
+            throw new IllegalArgumentException(
+                    "Không tìm thấy bảng SQL tương ứng với tham số: "
+                            + maBang
+            );
+        }
+    }
+
+    Map<String, BangKetQua> ketQua = new LinkedHashMap<>();
+
+    for (Map.Entry<String, String> muc : cacTruyVan.entrySet()) {
+        String maBang = muc.getKey();
+        String sql = muc.getValue();
+
+        Map<String, Object> thamSo = thamSoTheoBang.get(maBang);
+
+        BangKetQua bang = chayBangKetQuaTheoTen(sql, thamSo);
+
+        ketQua.put(maBang, bang);
+    }
+
+    return Collections.unmodifiableMap(
+            new LinkedHashMap<>(ketQua)
     );
 }
     /**

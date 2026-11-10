@@ -1,3 +1,4 @@
+
 package vn.pottel.reporting.controller;
 
 import java.time.LocalDate;
@@ -23,15 +24,22 @@ import vn.pottel.reporting.data.BangKetQua;
 /**
  * API báo cáo BC-DS-01 cho React.
  *
- * Lỗi đầu vào trả HTTP 400 kèm {"message": "..."} (xem GlobalExceptionHandler).
+ * Lỗi đầu vào trả HTTP 400 kèm {"message": "..."}
+ * (xem GlobalExceptionHandler).
  */
 @RestController
 @RequestMapping("/api/reports")
 public class ReportDataApiController {
 
-    private static final Set<Integer> PAGE_SIZES = Set.of(10, 20, 50, 100);
-    private static final Set<String> GOI_MOI_STATUSES = Set.of("HAS", "NONE");
-    private static final ZoneId VN_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
+    private static final Set<Integer> PAGE_SIZES =
+            Set.of(10, 20, 50, 100);
+
+    private static final Set<String> GOI_MOI_STATUSES =
+            Set.of("HAS", "NONE");
+
+    private static final ZoneId VN_ZONE =
+            ZoneId.of("Asia/Ho_Chi_Minh");
+
     private static final int MAX_MSISDN_LENGTH = 30;
     private static final int MAX_TEXT_LENGTH = 200;
 
@@ -41,7 +49,11 @@ public class ReportDataApiController {
         this.runner = runner;
     }
 
-    @GetMapping("/bc-ds-01")
+    // ==========================================
+    // API BC-DS-01: TỔNG HỢP VÀ CHI TIẾT KIT
+    // ==========================================
+
+   @GetMapping({"/bc-ds-01", "/bc-ds-02"})
     public Map<String, Object> layBaoCao(
             @RequestParam(defaultValue = "1B") String bc,
 
@@ -61,15 +73,21 @@ public class ReportDataApiController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int pageSize,
 
-            // false: chỉ lấy dữ liệu bảng, bỏ qua bảng 1A và danh sách lọc
-            // (React chỉ cần tải các phần này một lần).
+            // false: chỉ lấy dữ liệu bảng, bỏ qua bảng 1A và danh sách lọc.
+            // React chỉ cần tải các phần này một lần.
             @RequestParam(defaultValue = "true") boolean includeMeta
     ) {
         String selectedBc = chuanHoaBaoCao(bc);
 
         kiemTraThamSo(
-                fromDate, toDate, msisdn, kitStatus,
-                reconciliationStatus, goiMoiStatus, page, pageSize
+                fromDate,
+                toDate,
+                msisdn,
+                kitStatus,
+                reconciliationStatus,
+                goiMoiStatus,
+                page,
+                pageSize
         );
 
         ThamSoBaoCao thamSo = new ThamSoBaoCao(
@@ -86,7 +104,7 @@ public class ReportDataApiController {
         Map<String, Object> response = new LinkedHashMap<>();
 
         if (includeMeta) {
-            // Bảng 1A: Tổng quan và danh sách lựa chọn cho bộ lọc
+            // Thông tin tổng quan và danh sách lựa chọn bộ lọc.
             response.put("summary", runner.chayTongQuan());
             response.put("kitStatuses", runner.layDanhSachTrangThaiKit());
             response.put(
@@ -102,10 +120,15 @@ public class ReportDataApiController {
         int totalRows;
 
         if ("1B".equals(selectedBc)) {
+
+            // 1B thuộc BC-DS-01.
             totalRows = runner.demSoNgayBang1B(thamSo);
+
             kiemTraTrang(thamSo, totalRows);
 
-            KetQuaBaoCao ketQua = runner.chayBcDs01(thamSo, Set.of("1B"));
+            KetQuaBaoCao ketQua =
+                    runner.chayBcDs01(thamSo, Set.of("1B"));
+
             BangKetQua bang = ketQua.layBang("1B");
 
             if (bang == null) {
@@ -118,8 +141,12 @@ public class ReportDataApiController {
             response.put("subscriberDetails", null);
 
         } else {
+
+            // 1C và 1D thuộc BC-DS-02.
+            // 1C: dữ liệu chi tiết thuê bao.
+            // 1D: tổng số dòng để phục vụ phân trang.
             KetQuaBaoCao ketQua =
-                    runner.chayBcDs01(thamSo, Set.of("1C", "1D"));
+                    runner.chayBcDs02(thamSo, Set.of("1C", "1D"));
 
             BangKetQua bang = ketQua.layBang("1C");
             BangKetQua bangDem = ketQua.layBang("1D");
@@ -131,6 +158,7 @@ public class ReportDataApiController {
             }
 
             totalRows = layTongSoDong(bangDem);
+
             kiemTraTrang(thamSo, totalRows);
 
             response.put("dailySummary", null);
@@ -138,7 +166,10 @@ public class ReportDataApiController {
         }
 
         response.put("totalRows", totalRows);
-        response.put("totalPages", tinhSoTrang(totalRows, thamSo.kichThuoc()));
+        response.put(
+                "totalPages",
+                tinhSoTrang(totalRows, thamSo.kichThuoc())
+        );
 
         return response;
     }
@@ -156,7 +187,9 @@ public class ReportDataApiController {
             return "1C";
         }
 
-        throw badRequest("Loại báo cáo không hợp lệ (chỉ hỗ trợ 1B hoặc 1C).");
+        throw badRequest(
+                "Loại báo cáo không hợp lệ (chỉ hỗ trợ 1B hoặc 1C)."
+        );
     }
 
     private void kiemTraThamSo(
@@ -167,18 +200,22 @@ public class ReportDataApiController {
             String reconciliationStatus,
             String goiMoiStatus,
             int page,
-            int pageSize) {
-
+            int pageSize
+    ) {
         if (fromDate != null && toDate != null
                 && fromDate.isAfter(toDate)) {
-            throw badRequest("Ngày bắt đầu không được lớn hơn ngày kết thúc.");
+            throw badRequest(
+                    "Ngày bắt đầu không được lớn hơn ngày kết thúc."
+            );
         }
 
         LocalDate homNay = LocalDate.now(VN_ZONE);
 
         if ((fromDate != null && fromDate.isAfter(homNay))
                 || (toDate != null && toDate.isAfter(homNay))) {
-            throw badRequest("Ngày lọc không được vượt quá ngày hiện tại.");
+            throw badRequest(
+                    "Ngày lọc không được vượt quá ngày hiện tại."
+            );
         }
 
         if (page < 1) {
@@ -187,22 +224,27 @@ public class ReportDataApiController {
 
         if (!PAGE_SIZES.contains(pageSize)) {
             throw badRequest(
-                    "Số dòng mỗi trang không hợp lệ (chỉ nhận 10, 20, 50 hoặc 100)."
+                    "Số dòng mỗi trang không hợp lệ "
+                            + "(chỉ nhận 10, 20, 50 hoặc 100)."
             );
         }
 
-        if (msisdn != null && msisdn.trim().length() > MAX_MSISDN_LENGTH) {
+        if (msisdn != null
+                && msisdn.trim().length() > MAX_MSISDN_LENGTH) {
             throw badRequest("MSISDN quá dài.");
         }
 
-        if (tooLong(kitStatus) || tooLong(reconciliationStatus)) {
+        if (tooLong(kitStatus)
+                || tooLong(reconciliationStatus)) {
             throw badRequest("Giá trị bộ lọc quá dài.");
         }
 
-        if (goiMoiStatus != null && !goiMoiStatus.isBlank()
+        if (goiMoiStatus != null
+                && !goiMoiStatus.isBlank()
                 && !GOI_MOI_STATUSES.contains(goiMoiStatus.trim())) {
             throw badRequest(
-                    "Tình trạng GOI_MOI không hợp lệ (chỉ nhận HAS hoặc NONE)."
+                    "Tình trạng GOI_MOI không hợp lệ "
+                            + "(chỉ nhận HAS hoặc NONE)."
             );
         }
     }
@@ -211,14 +253,21 @@ public class ReportDataApiController {
         return value != null && value.length() > MAX_TEXT_LENGTH;
     }
 
-    private void kiemTraTrang(ThamSoBaoCao thamSo, int totalRows) {
-        if (thamSo.trang() > tinhSoTrang(totalRows, thamSo.kichThuoc())) {
+    private void kiemTraTrang(
+            ThamSoBaoCao thamSo,
+            int totalRows
+    ) {
+        if (thamSo.trang()
+                > tinhSoTrang(totalRows, thamSo.kichThuoc())) {
             throw badRequest("Số trang không hợp lệ.");
         }
     }
 
     private int tinhSoTrang(int totalRows, int pageSize) {
-        return Math.max(1, (int) Math.ceil((double) totalRows / pageSize));
+        return Math.max(
+                1,
+                (int) Math.ceil((double) totalRows / pageSize)
+        );
     }
 
     private int layTongSoDong(BangKetQua bangDem) {
@@ -229,14 +278,18 @@ public class ReportDataApiController {
         List<Map<String, Object>> dong = bangDem.dong();
         Object value = dong.get(0).get("total_rows");
 
-        return value == null ? 0 : ((Number) value).intValue();
+        return value == null
+                ? 0
+                : ((Number) value).intValue();
     }
 
     private ResponseStatusException badRequest(String message) {
-        return new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+        return new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                message
+        );
     }
 
-    
     // ==========================================
     // API BC-DT-01: DOANH THU THEO NGÀY
     // ==========================================
@@ -289,9 +342,8 @@ public class ReportDataApiController {
         return response;
     }
 
-
     // ==========================================
-    // BC-DT-02 - CHI TIẾT DOANH THU THEO THUÊ BAO
+    // API BC-DT-02: CHI TIẾT DOANH THU THEO THUÊ BAO
     // ==========================================
 
     @GetMapping("/bc-dt-02")
@@ -301,13 +353,17 @@ public class ReportDataApiController {
             LocalDate date
     ) {
         if (date == null) {
-            throw badRequest("Ngày xem báo cáo không được để trống.");
+            throw badRequest(
+                    "Ngày xem báo cáo không được để trống."
+            );
         }
 
         LocalDate homNay = LocalDate.now(VN_ZONE);
 
         if (date.isAfter(homNay)) {
-            throw badRequest("Ngày xem báo cáo không được vượt quá ngày hiện tại.");
+            throw badRequest(
+                    "Ngày xem báo cáo không được vượt quá ngày hiện tại."
+            );
         }
 
         KetQuaBaoCao ketQua = runner.chayBcDt02(date);
@@ -329,5 +385,4 @@ public class ReportDataApiController {
 
         return response;
     }
-
 }

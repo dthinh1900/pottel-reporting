@@ -1,10 +1,10 @@
-
 -- =====================================================
 -- BC-DT-01: TỔNG HỢP DOANH THU THEO NGÀY
+--
 -- 1A: Tổng hợp doanh thu theo ngày
 -- Tham số:
---   1. Ngày bắt đầu (YYYY-MM-DD)
---   2. Ngày kết thúc (YYYY-MM-DD)
+--   :tuNgay
+--   :denNgay
 -- =====================================================
 
 -- @table 1A
@@ -13,8 +13,8 @@ WITH
 -- 1. KHOẢNG NGÀY BÁO CÁO
 tham_so AS (
     SELECT
-        TO_DATE(CAST(? AS TEXT), 'YYYY-MM-DD') AS tu_ngay,
-        TO_DATE(CAST(? AS TEXT), 'YYYY-MM-DD') AS den_ngay,
+        CAST(:tuNgay AS DATE) AS tu_ngay,
+        CAST(:denNgay AS DATE) AS den_ngay,
         0.10::numeric AS vat_dt
 ),
 

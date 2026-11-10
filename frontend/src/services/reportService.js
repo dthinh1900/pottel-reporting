@@ -44,6 +44,50 @@ export function fetchBcDs01(query, signal) {
   return apiFetch(`/reports/bc-ds-01?${params.toString()}`, { signal })
 }
 
+// Gọi API báo cáo BC-DS-02.
+export function fetchBcDs02(query, signal) {
+  const {
+    bc,
+    fromDate,
+    toDate,
+    msisdn,
+    kitStatus,
+    reconciliationStatus,
+    goiMoiStatus,
+    page,
+    pageSize,
+    includeMeta,
+  } = query
+
+  const params = new URLSearchParams({
+    bc,
+    page: String(page),
+    pageSize: String(pageSize),
+  })
+
+  function setIfPresent(name, value) {
+    const text = (value ?? '').trim()
+    if (text) params.set(name, text)
+  }
+
+  setIfPresent('fromDate', fromDate)
+  setIfPresent('toDate', toDate)
+
+  if (bc === '1C') {
+    setIfPresent('msisdn', msisdn)
+    setIfPresent('kitStatus', kitStatus)
+    setIfPresent('reconciliationStatus', reconciliationStatus)
+    setIfPresent('goiMoiStatus', goiMoiStatus)
+  }
+
+  if (!includeMeta) params.set('includeMeta', 'false')
+
+  return apiFetch(
+    `/reports/bc-ds-02?${params.toString()}`,
+    { signal }
+  )
+}
+
 // Gọi API báo cáo BC-DT-01.
 // Lấy dữ liệu tổng hợp doanh thu theo ngày.
 export function fetchBcDt01(query, signal) {

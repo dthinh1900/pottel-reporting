@@ -1,5 +1,5 @@
 import { formatDate, formatNumber } from '../../../../utils/format'
-import Pagination from '../../../../components/common/Pagination'
+
 
 // Màu badge cho tình trạng đối soát:
 // xanh = Khớp KIT, đỏ = Không tìm thấy KIT, vàng = các trạng thái còn lại
@@ -11,7 +11,7 @@ function reconciliationBadge(status) {
 
 // Bảng 1C - Chi tiết thuê bao
 // rowOffset: số dòng đứng trước trang hiện tại, dùng để đánh STT
-function SubscriberTable({ rows, rowOffset, loading, pagination }) {
+function SubscriberTable({ rows, rowOffset, loading }) {
   const empty = rows.length === 0
 
   return (
@@ -75,7 +75,7 @@ function SubscriberTable({ rows, rowOffset, loading, pagination }) {
         </table>
       </div>
 
-      <Pagination loading={loading} {...pagination} />
+
     </section>
   )
 }

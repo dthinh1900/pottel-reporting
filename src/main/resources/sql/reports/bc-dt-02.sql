@@ -12,7 +12,7 @@ WITH
 -- 1. NGÀY CẦN XEM
 tham_so AS (
     SELECT
-        TO_DATE(CAST(? AS TEXT), 'YYYY-MM-DD') AS ngay_xem,
+        CAST(:ngay AS DATE) AS ngay_xem,
         0.10::numeric AS vat_dt
 ),
 

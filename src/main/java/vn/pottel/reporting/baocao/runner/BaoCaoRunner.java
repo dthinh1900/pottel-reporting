@@ -1,12 +1,12 @@
+
 package vn.pottel.reporting.baocao.runner;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Arrays;
-import java.sql.Date;
-import java.util.LinkedHashMap;
-import java.time.LocalDate;
 
 import org.springframework.stereotype.Component;
 
@@ -45,9 +45,8 @@ public class BaoCaoRunner {
      */
     public KetQuaBaoCao chay(
             String maBaoCao,
-            Map<String, Object[]> thamSoTheoBang
+            Map<String, Map<String, Object>> thamSoTheoBang
     ) {
-
         DinhNghiaBaoCao dinhNghia = danhMucBaoCao.lay(maBaoCao);
 
         if (dinhNghia == null) {
@@ -66,6 +65,8 @@ public class BaoCaoRunner {
 
         Map<String, String> tatCaTruyVan =
                 sqlStore.tachCacBang(noiDungSql);
+        
+        
 
         // Chỉ chạy những bảng được yêu cầu.
         Map<String, String> cacTruyVan = new LinkedHashMap<>();
@@ -83,7 +84,7 @@ public class BaoCaoRunner {
         }
 
         Map<String, BangKetQua> cacBang =
-                queryRunner.chayNhieuBang(
+                queryRunner.chayNhieuBangTheoTen(
                         cacTruyVan,
                         thamSoTheoBang
                 );
@@ -95,16 +96,87 @@ public class BaoCaoRunner {
         );
     }
 
+    // =====================================================
+    // BC-DS-01: TỔNG QUAN VÀ TỔNG HỢP THEO NGÀY
+    // Gồm bảng 1A và 1B.
+    // =====================================================
+
     /**
-     * Chạy BC-DS-01 với các tham số lấy từ bộ lọc.
+     * Chạy các bảng được yêu cầu của BC-DS-01.
      *
-     * bangCanChay: các mã bảng cần chạy (1A, 1B, 1C, 1D).
+     * bangCanChay: 1A, 1B.
      */
     public KetQuaBaoCao chayBcDs01(
             ThamSoBaoCao t,
             Set<String> bangCanChay
     ) {
+        if (t == null) {
+            throw new IllegalArgumentException(
+                    "Tham số báo cáo không được để trống."
+            );
+        }
 
+        if (bangCanChay == null || bangCanChay.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Danh sách bảng cần chạy không được để trống."
+            );
+        }
+
+        Map<String, Map<String, Object>> thamSoTheoBang =
+                new LinkedHashMap<>();
+
+        // Bảng 1A: Không cần tham số.
+        if (bangCanChay.contains("1A")) {
+            thamSoTheoBang.put("1A", Map.of());
+        }
+
+        // Bảng 1B: Tham số ngày và phân trang.
+        if (bangCanChay.contains("1B")) {
+            Map<String, Object> thamSo1B = new LinkedHashMap<>();
+
+            thamSo1B.put(
+                    "tuNgay",
+                    t.tuNgay() == null ? null : Date.valueOf(t.tuNgay())
+            );
+
+            thamSo1B.put(
+                    "denNgay",
+                    t.denNgay() == null ? null : Date.valueOf(t.denNgay())
+            );
+
+            thamSo1B.put("limit", t.kichThuoc());
+            thamSo1B.put("offset", t.tinhOffset());
+
+            thamSoTheoBang.put("1B", thamSo1B);
+        }
+
+        return chay("BC-DS-01", thamSoTheoBang);
+    }
+
+    /**
+     * Chạy toàn bộ BC-DS-01: bảng 1A và 1B.
+     */
+    public KetQuaBaoCao chayBcDs01(ThamSoBaoCao thamSo) {
+        return chayBcDs01(
+                thamSo,
+                Set.of("1A", "1B")
+        );
+    }
+
+    // =====================================================
+    // BC-DS-02: CHI TIẾT THUÊ BAO
+    // Gồm bảng 1C và 1D.
+    // =====================================================
+
+    /**
+     * Chạy các bảng được yêu cầu của BC-DS-02.
+     *
+     * bangCanChay: 1C, 1D.
+     */
+    public KetQuaBaoCao chayBcDs02(
+            ThamSoBaoCao t,
+            Set<String> bangCanChay
+    ) {
         if (t == null) {
             throw new IllegalArgumentException(
                     "Tham số báo cáo không được để trống."
@@ -140,71 +212,60 @@ public class BaoCaoRunner {
                         || t.tinhTrangGoiMoi().isBlank()
                         ? null : t.tinhTrangGoiMoi().trim();
 
-        Map<String, Object[]> thamSoTheoBang = new LinkedHashMap<>();
+        // Sáu tham số lọc dùng chung cho bảng 1C và 1D.
+        Map<String, Object> thamSoLoc = new LinkedHashMap<>();
 
-        // Bảng 1A: Không cần tham số.
-        if (bangCanChay.contains("1A")) {
-            thamSoTheoBang.put("1A", new Object[]{});
-        }
+        thamSoLoc.put("tuNgay", tuNgay);
+        thamSoLoc.put("denNgay", denNgay);
+        thamSoLoc.put("msisdn", msisdn);
+        thamSoLoc.put("trangThaiKit", trangThaiKit);
+        thamSoLoc.put("trangThaiDoiSoat", trangThaiDoiSoat);
+        thamSoLoc.put("tinhTrangGoiMoi", tinhTrangGoiMoi);
 
-        // Bảng 1B: 4 tham số.
-        if (bangCanChay.contains("1B")) {
-            thamSoTheoBang.put("1B", new Object[]{
-                    tuNgay,
-                    denNgay,
-                    t.kichThuoc(),
-                    t.tinhOffset()
-            });
-        }
+        Map<String, Map<String, Object>> thamSoTheoBang =
+                new LinkedHashMap<>();
 
-        // 13 tham số lọc dùng chung cho bảng 1C và 1D.
-        Object[] thamSoLoc = new Object[]{
-
-                // 1-4: Lọc theo ngày đăng ký KIT (registed_date).
-                tuNgay, tuNgay, denNgay, denNgay,
-
-                // 5-6: Lọc MSISDN.
-                msisdn, msisdn,
-
-                // 7-8: Lọc trạng thái KIT.
-                trangThaiKit, trangThaiKit,
-
-                // 9-10: Lọc trạng thái đối soát.
-                trangThaiDoiSoat, trangThaiDoiSoat,
-
-                // 11-13: Lọc tình trạng GOI_MOI.
-                tinhTrangGoiMoi,
-                tinhTrangGoiMoi,
-                tinhTrangGoiMoi
-        };
-
-        // Bảng 1C: 13 tham số lọc + 2 tham số phân trang.
+        // Bảng 1C: Bộ lọc và phân trang.
         if (bangCanChay.contains("1C")) {
-            Object[] thamSo1C = Arrays.copyOf(
-                    thamSoLoc,
-                    thamSoLoc.length + 2
-            );
+            Map<String, Object> thamSo1C =
+                    new LinkedHashMap<>(thamSoLoc);
 
-            thamSo1C[13] = t.kichThuoc();
-            thamSo1C[14] = t.tinhOffset();
+            thamSo1C.put("limit", t.kichThuoc());
+            thamSo1C.put("offset", t.tinhOffset());
 
             thamSoTheoBang.put("1C", thamSo1C);
         }
 
-        // Bảng 1D: 13 tham số để đếm tổng số dòng của 1C.
+        // Bảng 1D: Chỉ có bộ lọc, không phân trang.
         if (bangCanChay.contains("1D")) {
-            thamSoTheoBang.put("1D", thamSoLoc);
+            thamSoTheoBang.put(
+                    "1D",
+                    new LinkedHashMap<>(thamSoLoc)
+            );
         }
 
-        return chay("BC-DS-01", thamSoTheoBang);
+        return chay("BC-DS-02", thamSoTheoBang);
     }
 
     /**
-     * Lấy tổng số dòng của bảng 1C từ bảng đếm 1D.
+     * Chạy toàn bộ BC-DS-02: bảng 1C và 1D.
+     */
+    public KetQuaBaoCao chayBcDs02(ThamSoBaoCao thamSo) {
+        return chayBcDs02(
+                thamSo,
+                Set.of("1C", "1D")
+        );
+    }
+
+    /**
+     * Lấy tổng số dòng của bảng 1C
+     * thông qua bảng đếm 1D thuộc BC-DS-02.
      */
     public int demDongBang1C(ThamSoBaoCao t) {
-
-        KetQuaBaoCao ketQua = chayBcDs01(t, Set.of("1D"));
+        KetQuaBaoCao ketQua = chayBcDs02(
+                t,
+                Set.of("1D")
+        );
 
         BangKetQua bangDem = ketQua.layBang("1D");
 
@@ -219,18 +280,16 @@ public class BaoCaoRunner {
                 : ((Number) giaTri).intValue();
     }
 
-    // =========================
-    // BẢNG 1A - TỔNG QUAN
-    // =========================
+    // =====================================================
+    // CÁC PHƯƠNG THỨC SERVICE BC-DS-01 CŨ
+    // =====================================================
 
+    // Bảng 1A - Tổng quan.
     public Map<String, Object> chayTongQuan() {
         return bcDs01Service.getSummary();
     }
 
-    // =========================
-    // BẢNG 1B - TỔNG HỢP THEO NGÀY
-    // =========================
-
+    // Bảng 1B - Tổng hợp theo ngày.
     public List<Map<String, Object>> chayBang1B(ThamSoBaoCao t) {
         return bcDs01Service.getDailySummary(
                 t.tuNgay(),
@@ -247,10 +306,7 @@ public class BaoCaoRunner {
         );
     }
 
-    // =========================
-    // BẢNG 1C - CHI TIẾT THUÊ BAO
-    // =========================
-
+    // Bảng 1C - Chi tiết thuê bao (service cũ).
     public List<Map<String, Object>> chayBang1C(ThamSoBaoCao t) {
         return bcDs01Service.getSubscriberDetails(
                 t.tuNgay(),
@@ -264,69 +320,65 @@ public class BaoCaoRunner {
         );
     }
 
-        // Chạy toàn bộ các bảng báo cáo BC-DS-01
-        public KetQuaBaoCao chayBcDs01(ThamSoBaoCao thamSo) {
-        return chayBcDs01(
-                thamSo,
-                Set.of("1A", "1B", "1C", "1D")
-        );
+    // =====================================================
+    // DANH SÁCH TRẠNG THÁI BỘ LỌC
+    // =====================================================
+
+    public List<String> layDanhSachTrangThaiKit() {
+        return bcDs01Service.getKitStatuses();
+    }
+
+    public List<String> layDanhSachTrangThaiDoiSoat() {
+        return bcDs01Service.getReconciliationStatuses();
+    }
+
+    // =====================================================
+    // BC-DT-01 - DOANH THU THEO NGÀY
+    // =====================================================
+
+    public KetQuaBaoCao chayBcDt01(
+            LocalDate tuNgay,
+            LocalDate denNgay
+    ) {
+        if (tuNgay == null || denNgay == null) {
+            throw new IllegalArgumentException(
+                    "Ngày bắt đầu và ngày kết thúc không được để trống."
+            );
         }
-        // =========================
-        // DANH SÁCH TRẠNG THÁI BỘ LỌC
-        // =========================
 
-        public List<String> layDanhSachTrangThaiKit() {
-                return bcDs01Service.getKitStatuses();
-        }
+        Map<String, Map<String, Object>> thamSoTheoBang =
+                new LinkedHashMap<>();
 
-        public List<String> layDanhSachTrangThaiDoiSoat() {
-                return bcDs01Service.getReconciliationStatuses();
-        }
+        Map<String, Object> thamSo1A = new LinkedHashMap<>();
 
-        
-        // =========================
-        // BC-DT-01 - DOANH THU THEO NGÀY
-        // =========================
+        thamSo1A.put("tuNgay", tuNgay);
+        thamSo1A.put("denNgay", denNgay);
 
-        public KetQuaBaoCao chayBcDt01(
-                LocalDate tuNgay,
-                LocalDate denNgay
-        ) {
-                if (tuNgay == null || denNgay == null) {
-                throw new IllegalArgumentException(
-                        "Ngày bắt đầu và ngày kết thúc không được để trống."
-                );
-                }
+        thamSoTheoBang.put("1A", thamSo1A);
 
-                Map<String, Object[]> thamSoTheoBang =
-                        new LinkedHashMap<>();
+        return chay("BC-DT-01", thamSoTheoBang);
+    }
 
-                thamSoTheoBang.put("1A", new Object[]{
-                        tuNgay.toString(),
-                        denNgay.toString()
-                });
+    // =====================================================
+    // BC-DT-02 - CHI TIẾT DOANH THU
+    // =====================================================
 
-                return chay("BC-DT-01", thamSoTheoBang);
-        }
-        // =========================
-        // BC-DT-02 - CHI TIẾT DOANH THU
-        // =========================
-
-        public KetQuaBaoCao chayBcDt02(LocalDate ngay) {
-
+    public KetQuaBaoCao chayBcDt02(LocalDate ngay) {
         if (ngay == null) {
-                throw new IllegalArgumentException(
-                        "Ngày xem báo cáo không được để trống."
-                );
+            throw new IllegalArgumentException(
+                    "Ngày xem không được để trống."
+            );
         }
 
-        Map<String, Object[]> thamSoTheoBang = new LinkedHashMap<>();
+        Map<String, Map<String, Object>> thamSoTheoBang =
+                new LinkedHashMap<>();
 
-        thamSoTheoBang.put("1A", new Object[]{
-                ngay.toString()
-        });
+        Map<String, Object> thamSoChiTiet = new LinkedHashMap<>();
+
+        thamSoChiTiet.put("ngay", ngay.toString());
+
+        thamSoTheoBang.put("1A", thamSoChiTiet);
 
         return chay("BC-DT-02", thamSoTheoBang);
-        }
-
+    }
 }

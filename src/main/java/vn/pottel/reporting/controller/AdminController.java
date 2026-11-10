@@ -14,7 +14,7 @@ import vn.pottel.reporting.user.entity.AppUser;
 import vn.pottel.reporting.user.repository.AppUserRepository;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/admin/accounts")
 public class AdminController {
 
     private final AppUserRepository appUserRepository;
@@ -29,7 +29,7 @@ public class AdminController {
     }
 
     // Hiển thị danh sách tài khoản
-    @GetMapping("/accounts")
+    @GetMapping
     public String accounts(
             Model model,
             Authentication authentication) {

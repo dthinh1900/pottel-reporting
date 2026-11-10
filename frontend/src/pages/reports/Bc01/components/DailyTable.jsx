@@ -1,8 +1,8 @@
 import { formatDate, formatNumber } from '../../../../utils/format'
-import Pagination from '../../../../components/common/Pagination'
+
 
 // Bảng 1B - Tổng hợp GOI_MOI theo ngày
-function DailyTable({ rows, loading, pagination }) {
+function DailyTable({ rows, loading }) {
   const empty = rows.length === 0
 
   return (
@@ -50,7 +50,7 @@ function DailyTable({ rows, loading, pagination }) {
         </table>
       </div>
 
-      <Pagination loading={loading} {...pagination} />
+      
     </section>
   )
 }

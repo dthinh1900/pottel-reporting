@@ -17,7 +17,7 @@ import vn.pottel.reporting.baocao.model.KetQuaBaoCao;
 import vn.pottel.reporting.data.BangKetQua;
 
 @Controller
-@RequestMapping("/reports")
+@RequestMapping("/reports/bc-ds-01")
 public class ReportController {
 
         private final BaoCaoRunner runner;
@@ -30,7 +30,7 @@ public class ReportController {
         // HIỂN THỊ TOÀN BỘ TRANG BC-DS-01
         // ==========================================
 
-        @GetMapping("/bc-ds-01")
+        @GetMapping
         public String hienThiBaoCao(
                 @RequestParam(defaultValue = "1B") String bc,
 

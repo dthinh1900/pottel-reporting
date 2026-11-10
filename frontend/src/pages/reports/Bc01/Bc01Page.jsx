@@ -8,6 +8,7 @@ import { validateDateRange } from '../../../utils/format'
 import SummaryCards from './components/SummaryCards'
 import ReportFilters, { EMPTY_FILTERS } from './components/ReportFilters'
 import DailyTable from './components/DailyTable'
+import Pagination from '../../../components/common/Pagination'
 
 const REPORT_PATH = '/reports/bc-ds-01'
 const DEFAULT_PAGE_SIZE = 20
@@ -202,10 +203,11 @@ function Bc01Page() {
           onReset={handleResetFilters}
         />
 
+        <Pagination loading={loading} {...pagination} />
+
         <DailyTable
           rows={rows1B}
           loading={loading}
-          pagination={pagination}
         />
       </section>
 
