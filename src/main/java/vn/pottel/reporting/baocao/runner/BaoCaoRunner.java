@@ -39,25 +39,25 @@ public class BaoCaoRunner {
         this.queryRunner = queryRunner;
     }
 
+    // =====================================================
+    // THỰC THI BÁO CÁO TỔNG QUÁT
+    // =====================================================
+
     /**
-     * Chạy một báo cáo có nhiều bảng kết quả.
-     * Chỉ các bảng có tên trong thamSoTheoBang mới được chạy.
+     * Chạy những bảng được chỉ định.
+     *
+     * Phương thức này vẫn được giữ để tương thích với
+     * các API và service cũ.
      */
     public KetQuaBaoCao chay(
             String maBaoCao,
             Map<String, Map<String, Object>> thamSoTheoBang
     ) {
-        DinhNghiaBaoCao dinhNghia = danhMucBaoCao.lay(maBaoCao);
+        DinhNghiaBaoCao dinhNghia = layDinhNghia(maBaoCao);
 
-        if (dinhNghia == null) {
+        if (thamSoTheoBang == null || thamSoTheoBang.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Không tìm thấy báo cáo: " + maBaoCao
-            );
-        }
-
-        if (!dinhNghia.kichHoat()) {
-            throw new IllegalStateException(
-                    "Báo cáo đang bị tắt: " + maBaoCao
+                    "Danh sách bảng cần chạy không được để trống."
             );
         }
 
@@ -65,10 +65,7 @@ public class BaoCaoRunner {
 
         Map<String, String> tatCaTruyVan =
                 sqlStore.tachCacBang(noiDungSql);
-        
-        
 
-        // Chỉ chạy những bảng được yêu cầu.
         Map<String, String> cacTruyVan = new LinkedHashMap<>();
 
         for (String maBang : thamSoTheoBang.keySet()) {
@@ -96,16 +93,153 @@ public class BaoCaoRunner {
         );
     }
 
+    /**
+     * Chạy báo cáo theo metadata trong DanhMucBaoCao.
+     *
+     * Tự động:
+     * 1. Kiểm tra báo cáo tồn tại và đang hoạt động.
+     * 2. Đọc file SQL đúng một lần.
+     * 3. Tách các bảng @table.
+     * 4. Bổ sung limit và offset theo metadata phân trang.
+     * 5. Chạy các bảng SQL và trả kết quả.
+     */
+    public KetQuaBaoCao chayTheoMetadata(
+            String maBaoCao,
+            Map<String, Object> thamSo
+    ) {
+        DinhNghiaBaoCao dinhNghia = layDinhNghia(maBaoCao);
+
+        Map<String, Object> thamSoChung = new LinkedHashMap<>();
+
+        if (thamSo != null) {
+            thamSoChung.putAll(thamSo);
+        }
+
+        // Bổ sung tham số phân trang theo metadata.
+        if (dinhNghia.phanTrang()) {
+            DinhNghiaBaoCao.PhanTrangDef phanTrang =
+                    dinhNghia.cauHinhPhanTrang();
+
+            int page = laySoNguyen(thamSoChung, "page", 1);
+            int pageSize = laySoNguyen(
+                    thamSoChung,
+                    "pageSize",
+                    phanTrang.kichThuocMacDinh()
+            );
+
+            if (page < 1) {
+                throw new IllegalArgumentException(
+                        "Số trang phải lớn hơn hoặc bằng 1."
+                );
+            }
+
+            if (!Set.of(10, 20, 50, 100).contains(pageSize)) {
+                throw new IllegalArgumentException(
+                        "Page size chỉ nhận 10, 20, 50 hoặc 100."
+                );
+            }
+
+            thamSoChung.put("limit", pageSize);
+            thamSoChung.put("offset", (page - 1) * pageSize);
+        }
+
+        // Đọc và tách SQL đúng một lần.
+        String noiDungSql = sqlStore.lay(dinhNghia.tepSql());
+
+        Map<String, String> tatCaTruyVan =
+                sqlStore.tachCacBang(noiDungSql);
+
+        if (tatCaTruyVan.isEmpty()) {
+            throw new IllegalStateException(
+                    "File SQL không có bảng @table: "
+                            + dinhNghia.tepSql()
+            );
+        }
+
+        // Kiểm tra metadata có khai báo bảng không tồn tại trong SQL.
+        for (String maBang : dinhNghia.cacBang().keySet()) {
+            if (!tatCaTruyVan.containsKey(maBang)) {
+                throw new IllegalStateException(
+                        "Metadata báo cáo " + maBaoCao
+                                + " khai báo bảng " + maBang
+                                + " nhưng file SQL không có @table tương ứng."
+                );
+            }
+        }
+
+        // Chạy tất cả bảng SQL.
+        // Bao gồm cả bảng ẩn dùng để đếm tổng số dòng.
+        Map<String, String> cacTruyVan = new LinkedHashMap<>();
+        Map<String, Map<String, Object>> thamSoTheoBang =
+                new LinkedHashMap<>();
+
+        for (Map.Entry<String, String> entry : tatCaTruyVan.entrySet()) {
+            String maBang = entry.getKey();
+
+            cacTruyVan.put(maBang, entry.getValue());
+            thamSoTheoBang.put(
+                    maBang,
+                    new LinkedHashMap<>(thamSoChung)
+            );
+        }
+
+        Map<String, BangKetQua> cacBang =
+                queryRunner.chayNhieuBangTheoTen(
+                        cacTruyVan,
+                        thamSoTheoBang
+                );
+
+        return new KetQuaBaoCao(
+                dinhNghia.maBaoCao(),
+                dinhNghia.tenBaoCao(),
+                cacBang
+        );
+    }
+
+    private DinhNghiaBaoCao layDinhNghia(String maBaoCao) {
+        DinhNghiaBaoCao dinhNghia =
+                danhMucBaoCao.lay(maBaoCao);
+
+        if (dinhNghia == null) {
+            throw new IllegalArgumentException(
+                    "Không tìm thấy báo cáo: " + maBaoCao
+            );
+        }
+
+        if (!dinhNghia.kichHoat()) {
+            throw new IllegalStateException(
+                    "Báo cáo đang bị tắt: " + maBaoCao
+            );
+        }
+
+        return dinhNghia;
+    }
+
+    private int laySoNguyen(
+            Map<String, Object> thamSo,
+            String ten,
+            int macDinh
+    ) {
+        Object giaTri = thamSo.get(ten);
+
+        if (giaTri == null) {
+            return macDinh;
+        }
+
+        try {
+            return Integer.parseInt(giaTri.toString());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    "Tham số " + ten + " phải là số nguyên."
+            );
+        }
+    }
+
     // =====================================================
-    // BC-DS-01: TỔNG QUAN VÀ TỔNG HỢP THEO NGÀY
-    // Gồm bảng 1A và 1B.
+    // CÁC PHƯƠNG THỨC CŨ - CHƯA XÓA TRONG GIAI ĐOẠN MIGRATION
     // =====================================================
 
-    /**
-     * Chạy các bảng được yêu cầu của BC-DS-01.
-     *
-     * bangCanChay: 1A, 1B.
-     */
+    // BC-DS-01: Chạy các bảng được yêu cầu.
     public KetQuaBaoCao chayBcDs01(
             ThamSoBaoCao t,
             Set<String> bangCanChay
@@ -125,12 +259,10 @@ public class BaoCaoRunner {
         Map<String, Map<String, Object>> thamSoTheoBang =
                 new LinkedHashMap<>();
 
-        // Bảng 1A: Không cần tham số.
         if (bangCanChay.contains("1A")) {
             thamSoTheoBang.put("1A", Map.of());
         }
 
-        // Bảng 1B: Tham số ngày và phân trang.
         if (bangCanChay.contains("1B")) {
             Map<String, Object> thamSo1B = new LinkedHashMap<>();
 
@@ -153,26 +285,11 @@ public class BaoCaoRunner {
         return chay("BC-DS-01", thamSoTheoBang);
     }
 
-    /**
-     * Chạy toàn bộ BC-DS-01: bảng 1A và 1B.
-     */
     public KetQuaBaoCao chayBcDs01(ThamSoBaoCao thamSo) {
-        return chayBcDs01(
-                thamSo,
-                Set.of("1A", "1B")
-        );
+        return chayBcDs01(thamSo, Set.of("1A", "1B"));
     }
 
-    // =====================================================
-    // BC-DS-02: CHI TIẾT THUÊ BAO
-    // Gồm bảng 1C và 1D.
-    // =====================================================
-
-    /**
-     * Chạy các bảng được yêu cầu của BC-DS-02.
-     *
-     * bangCanChay: 1C, 1D.
-     */
+    // BC-DS-02: Chạy các bảng được yêu cầu.
     public KetQuaBaoCao chayBcDs02(
             ThamSoBaoCao t,
             Set<String> bangCanChay
@@ -212,7 +329,6 @@ public class BaoCaoRunner {
                         || t.tinhTrangGoiMoi().isBlank()
                         ? null : t.tinhTrangGoiMoi().trim();
 
-        // Sáu tham số lọc dùng chung cho bảng 1C và 1D.
         Map<String, Object> thamSoLoc = new LinkedHashMap<>();
 
         thamSoLoc.put("tuNgay", tuNgay);
@@ -225,7 +341,6 @@ public class BaoCaoRunner {
         Map<String, Map<String, Object>> thamSoTheoBang =
                 new LinkedHashMap<>();
 
-        // Bảng 1C: Bộ lọc và phân trang.
         if (bangCanChay.contains("1C")) {
             Map<String, Object> thamSo1C =
                     new LinkedHashMap<>(thamSoLoc);
@@ -236,7 +351,6 @@ public class BaoCaoRunner {
             thamSoTheoBang.put("1C", thamSo1C);
         }
 
-        // Bảng 1D: Chỉ có bộ lọc, không phân trang.
         if (bangCanChay.contains("1D")) {
             thamSoTheoBang.put(
                     "1D",
@@ -247,25 +361,12 @@ public class BaoCaoRunner {
         return chay("BC-DS-02", thamSoTheoBang);
     }
 
-    /**
-     * Chạy toàn bộ BC-DS-02: bảng 1C và 1D.
-     */
     public KetQuaBaoCao chayBcDs02(ThamSoBaoCao thamSo) {
-        return chayBcDs02(
-                thamSo,
-                Set.of("1C", "1D")
-        );
+        return chayBcDs02(thamSo, Set.of("1C", "1D"));
     }
 
-    /**
-     * Lấy tổng số dòng của bảng 1C
-     * thông qua bảng đếm 1D thuộc BC-DS-02.
-     */
     public int demDongBang1C(ThamSoBaoCao t) {
-        KetQuaBaoCao ketQua = chayBcDs02(
-                t,
-                Set.of("1D")
-        );
+        KetQuaBaoCao ketQua = chayBcDs02(t, Set.of("1D"));
 
         BangKetQua bangDem = ketQua.layBang("1D");
 
@@ -284,12 +385,10 @@ public class BaoCaoRunner {
     // CÁC PHƯƠNG THỨC SERVICE BC-DS-01 CŨ
     // =====================================================
 
-    // Bảng 1A - Tổng quan.
     public Map<String, Object> chayTongQuan() {
         return bcDs01Service.getSummary();
     }
 
-    // Bảng 1B - Tổng hợp theo ngày.
     public List<Map<String, Object>> chayBang1B(ThamSoBaoCao t) {
         return bcDs01Service.getDailySummary(
                 t.tuNgay(),
@@ -306,7 +405,6 @@ public class BaoCaoRunner {
         );
     }
 
-    // Bảng 1C - Chi tiết thuê bao (service cũ).
     public List<Map<String, Object>> chayBang1C(ThamSoBaoCao t) {
         return bcDs01Service.getSubscriberDetails(
                 t.tuNgay(),
@@ -319,10 +417,6 @@ public class BaoCaoRunner {
                 t.tinhOffset()
         );
     }
-
-    // =====================================================
-    // DANH SÁCH TRẠNG THÁI BỘ LỌC
-    // =====================================================
 
     public List<String> layDanhSachTrangThaiKit() {
         return bcDs01Service.getKitStatuses();
@@ -350,7 +444,6 @@ public class BaoCaoRunner {
                 new LinkedHashMap<>();
 
         Map<String, Object> thamSo1A = new LinkedHashMap<>();
-
         thamSo1A.put("tuNgay", tuNgay);
         thamSo1A.put("denNgay", denNgay);
 
@@ -374,7 +467,6 @@ public class BaoCaoRunner {
                 new LinkedHashMap<>();
 
         Map<String, Object> thamSoChiTiet = new LinkedHashMap<>();
-
         thamSoChiTiet.put("ngay", ngay.toString());
 
         thamSoTheoBang.put("1A", thamSoChiTiet);

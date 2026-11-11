@@ -1,13 +1,11 @@
+
 import { useEffect, useState } from 'react'
 
 import Login from './pages/Login'
 import Home from './pages/Home'
-import Bc01Page from './pages/reports/Bc01/Bc01Page'
 import AccountsPage from './pages/admin/AccountsPage'
 import MainLayout from './components/layout/MainLayout'
-import Bc02Page from './pages/reports/Bc02/Bc02Page'
-import BcDt01Page from './pages/reports/BcDt01/BcDt01Page'
-import BcDt02Page from './pages/reports/BcDt02/BcDt02Page'
+import GenericReportPage from './pages/reports/GenericReportPage'
 
 import {
   AUTH_EXPIRED_EVENT,
@@ -18,16 +16,20 @@ import {
 
 import { navigate, useRoute } from './router'
 
+const REPORT_PATHS = {
+  '/reports/bc-ds-01': 'BC-DS-01',
+  '/reports/bc-ds-02': 'BC-DS-02',
+  '/reports/bc-dt-01': 'BC-DT-01',
+  '/reports/bc-dt-02': 'BC-DT-02',
+  '/reports/generic': null,
+}
+
 const KNOWN_PATHS = [
   '/',
-  '/reports/bc-ds-01',
-  '/reports/bc-ds-02',
-  '/reports/bc-dt-01',
-  '/reports/bc-dt-02',
+  ...Object.keys(REPORT_PATHS),
   '/admin/accounts',
 ]
 
-// Kiểm tra tài khoản có quyền ADMIN hay không
 function hasAdminRole(user) {
   return (
     Array.isArray(user?.vaiTro) &&
@@ -35,7 +37,6 @@ function hasAdminRole(user) {
   )
 }
 
-// Trang hiển thị khi người dùng không đủ quyền
 function Forbidden() {
   return (
     <main className="main-container">
@@ -50,7 +51,6 @@ function Forbidden() {
   )
 }
 
-// Component chính
 function App() {
   const route = useRoute()
 
@@ -59,7 +59,6 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null)
   const [loginMessage, setLoginMessage] = useState('')
 
-  // Kiểm tra phiên đăng nhập khi mở ứng dụng
   useEffect(() => {
     async function checkLogin() {
       if (!getToken()) {
@@ -84,7 +83,6 @@ function App() {
     checkLogin()
   }, [])
 
-  // Khi JWT hết hạn thì quay về màn hình đăng nhập
   useEffect(() => {
     function handleExpired() {
       setCurrentUser(null)
@@ -94,20 +92,13 @@ function App() {
       )
     }
 
-    window.addEventListener(
-      AUTH_EXPIRED_EVENT,
-      handleExpired
-    )
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleExpired)
 
     return () => {
-      window.removeEventListener(
-        AUTH_EXPIRED_EVENT,
-        handleExpired
-      )
+      window.removeEventListener(AUTH_EXPIRED_EVENT, handleExpired)
     }
   }, [])
 
-  // Đường dẫn không tồn tại thì chuyển về trang chủ
   useEffect(() => {
     if (
       isAuthenticated &&
@@ -117,14 +108,12 @@ function App() {
     }
   }, [isAuthenticated, route.path])
 
-  // Xử lý đăng nhập thành công
   function handleLoginSuccess(user) {
     setCurrentUser(user)
     setIsAuthenticated(true)
     setLoginMessage('')
   }
 
-  // Xử lý đăng xuất
   function handleLogout() {
     logout()
 
@@ -135,7 +124,6 @@ function App() {
     navigate('/', { replace: true })
   }
 
-  // Đang kiểm tra trạng thái đăng nhập
   if (checkingAuth) {
     return (
       <div className="app">
@@ -144,7 +132,6 @@ function App() {
     )
   }
 
-  // Chưa đăng nhập
   if (!isAuthenticated) {
     return (
       <Login
@@ -156,18 +143,14 @@ function App() {
 
   const isAdmin = hasAdminRole(currentUser)
 
-  // Chọn trang theo đường dẫn
-  // Chọn trang theo đường dẫn
   let page
 
-  if (route.path === '/reports/bc-ds-01') {
-    page = <Bc01Page />
-  } else if (route.path === '/reports/bc-ds-02') {
-  page = <Bc02Page />
-  } else if (route.path === '/reports/bc-dt-01') {
-  page = <BcDt01Page />
-  } else if (route.path === '/reports/bc-dt-02') {
-  page = <BcDt02Page />
+  if (route.path in REPORT_PATHS) {
+    page = (
+      <GenericReportPage
+        initialReportCode={REPORT_PATHS[route.path]}
+      />
+    )
   } else if (route.path === '/admin/accounts') {
     page = isAdmin ? (
       <AccountsPage

@@ -1,0 +1,298 @@
+
+/* =====================================================
+   TRANG BÁO CÁO TỔNG QUÁT
+   ===================================================== */
+
+.report-heading {
+    margin-bottom: 28px;
+}
+
+.report-label {
+    display: inline-block;
+    padding: 7px 12px;
+    margin-bottom: 12px;
+    color: #facc15;
+    background: #111827;
+    border: 1px solid #eab308;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.report-heading h1 {
+    margin: 0 0 8px;
+    color: #14213d;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.report-heading p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* =====================================================
+   KHU VỰC CHỌN BÁO CÁO VÀ BỘ LỌC
+   ===================================================== */
+
+.generic-filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.generic-filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.generic-filter-item label {
+    color: #374151;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.generic-filter-item label span {
+    color: #dc2626;
+}
+
+.generic-filter-item input,
+.generic-filter-item select {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #1e293b;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.generic-filter-item input:focus,
+.generic-filter-item select:focus {
+    outline: none;
+    border-color: #eab308;
+    box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.15);
+}
+
+/* =====================================================
+   CÁC KHU VỰC BÁO CÁO
+   ===================================================== */
+
+.report-section {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.report-section h2 {
+    margin: 0 0 16px;
+    color: #14213d;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.report-section > p {
+    color: #64748b;
+    font-size: 14px;
+}
+
+/* =====================================================
+   NÚT CHẠY BÁO CÁO
+   ===================================================== */
+
+.report-section button {
+    min-height: 40px;
+    padding: 9px 18px;
+    border: 1px solid #d6a400;
+    border-radius: 7px;
+    background: #facc15;
+    color: #172033;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.report-section button:hover {
+    background: #eab308;
+}
+
+.report-section button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   THẺ THỐNG KÊ
+   ===================================================== */
+
+.generic-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 20px 0 28px;
+}
+
+.generic-summary-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 100px;
+    padding: 18px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #eab308;
+    border-radius: 9px;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.generic-summary-card span {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.generic-summary-card strong {
+    color: #14213d;
+    font-size: 24px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+/* =====================================================
+   PHÂN TRANG
+   ===================================================== */
+
+.generic-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.generic-pagination select {
+    min-height: 38px;
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #1e293b;
+}
+
+.generic-pagination span {
+    color: #475569;
+    font-size: 14px;
+}
+
+.generic-pagination button {
+    min-height: 36px;
+    padding: 7px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #1e293b;
+    cursor: pointer;
+}
+
+.generic-pagination button:hover:not(:disabled) {
+    border-color: #eab308;
+    background: #fef9c3;
+}
+
+.generic-pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   BẢNG DỮ LIỆU
+   ===================================================== */
+
+.generic-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.generic-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 13px;
+}
+
+.generic-report-table th,
+.generic-report-table td {
+    padding: 11px 13px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.generic-report-table th {
+    background: #f1f5f9;
+    color: #334155;
+    font-weight: 700;
+}
+
+.generic-report-table td {
+    color: #334155;
+}
+
+.generic-report-table tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+.generic-report-table tbody tr:hover {
+    background: #fefce8;
+}
+
+.generic-report-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 768px) {
+    .report-heading h1 {
+        font-size: 23px;
+    }
+
+    .generic-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .generic-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .generic-pagination {
+        justify-content: flex-start;
+    }
+
+    .report-section {
+        padding: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .generic-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
